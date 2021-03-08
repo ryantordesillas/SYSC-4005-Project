@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 
 
@@ -22,26 +25,44 @@ public class Workstation {
     private ArrayList<Component> C2_Buffer;
     private ArrayList<Component> C3_Buffer;
 
+    /** File for the processing time **/
+    private File service_file;
+
     /**
      * Default constructor for the Workstation
      * @param components The components that this Workstation takes
      */
-    public Workstation(Component[] components){
+    public Workstation(Component[] components, File file){
         for(int i = 0; i < components.length; i++){
+            // Create the ArrayLists that the Workstation will use
             if(components[i].getType() == "C1"){
                 C1_Buffer = new ArrayList<Component>();
             }
-            else if (components[i].getType() == "C2"){
+            if (components[i].getType() == "C2"){
                 C2_Buffer = new ArrayList<Component>();
-            } else {
+            }
+            if (components[i].getType() == "C3"){
                 C3_Buffer = new ArrayList<Component>();
             }
+
+            service_file = file;
         }
     }
 
 
     public void add_Component(ArrayList<Component> buffer, Component c){
         buffer.add(c);
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(service_file));
+            String st1 = br.readLine();
+            //wait
+            System.out.println("Processing Time: "+st1);
+
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     public ArrayList<Component> getC1_Buffer() {
