@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.Random;
+import java.lang.Math;
 
 public class Inspector extends Thread{
 
@@ -13,49 +14,46 @@ public class Inspector extends Thread{
      */
     private Workstation[] attachedWorkstations;
 
-    /** The file that contains the service times for this inspector **/
-    private File[] serviceFiles;
+    /** lambda used to generate random numbers */
+    private double[] lambdas;
 
     /**
      * The default constructor for the Inspector Object
      * @param components The components that this
-     * @param workstations
+     * @param workstations the workstations attached to the
+     * @param lambdas the lambdas that will be used in the random number generation
      */
-    public Inspector(Component[] components, Workstation[] workstations, File[] files){
+    public Inspector(Component[] components, Workstation[] workstations, double[] lambdas){
         inspectComponents = components;
         attachedWorkstations = workstations;
-        serviceFiles = files;
+        this.lambdas = lambdas;
     }
 
     public void run(){
         // if there is one file no need for random variables
-        if (serviceFiles.length == 1){
-            try{
-                // Read an inspection time from a file
-                BufferedReader br = new BufferedReader(new FileReader(serviceFiles[0]));
+        if (lambdas.length == 1){
 
-                // This will be used for Inspector 1
-                String st;
-                while ((st = br.readLine()) != null){
-                    //System.out.println(st);
+            // Create a random number generator to generate doubles
+            Random rnd = new Random();
 
-                    // Find the most available workstation
-                    Workstation availableWorkstation = findAvailableWorkstation();
+            // This will be used for Inspector 1
+            int x = 0;
+            while (x <= 200) {
+                //System.out.println(st);
+                double time = (-1 / lambdas[0]) * Math.log(rnd.nextDouble());
+//                System.out.println(time);
 
+                // Find the most available workstation
+                Workstation availableWorkstation = findAvailableWorkstation();
+
+                if (!availableWorkstation.isC1Full()){
                     availableWorkstation.add_Component(new Component("C1"));
+                    x++;
                 }
-
-
-
-
-            } catch(Exception e){
-                e.printStackTrace();
             }
+
         } else { // there are two components being inspected
             try{
-                // Read an inspection time from a file
-                BufferedReader br_1 = new BufferedReader(new FileReader(serviceFiles[0]));
-                BufferedReader br_2 = new BufferedReader(new FileReader(serviceFiles[1]));
 
                 // use a random number to determine which file to read from
                 Random rand = new Random();
@@ -63,45 +61,35 @@ public class Inspector extends Thread{
                 // Use integers from 0-99
                 int rnd = rand.nextInt(100);
 
-                String st1 = br_1.readLine();
-                String st2 = br_2.readLine();
+
                 int x = 0;
-                while(st1 != null || st2 != null){
+                while(x <= 200){
                     // This will need to be tweaked as it will continue until both files are completely read
                     if(rnd <= 49){
                         //tba: if str is null while waiting for the other list, do not send a component
-                        x++;
-                        //System.out.println("File1: " + st1);
-                        st1 = br_1.readLine();
 
-                        if (st1 != null) {
-                            // Make the thread wait using the time read in from the file
-
-                            // There will need to be some type of wait if the ArrayList is full (size == 2)
-//                            while(attachedWorkstations[0].get_Buffer().size() == 2){
-//                                System.out.println("Waiting...");
-//                            }
-
-                            // Send component 2 to Workstation 2
+                        if (!attachedWorkstations[0].isBufferFull()) {
+                            x++;
+                            double time = (-1/lambdas[0]) * Math.log(rand.nextDouble());
                             attachedWorkstations[0].add_Component(new Component("C2"));
+//                            System.out.println(time);
+                        } else {
+                            //System.out.println("Waiting...");
                         }
+
                     } else {
-                        x++;
-                        //System.out.println("File2: "+ st2);
-                        st2 = br_2.readLine();
 
-                        if (st2 != null) {
 
-                            // Wait for the thread using the time read in from the file
-
-                            // There will need to be some type of wait if the ArrayList is full (size == 2)
-//                            while(attachedWorkstations[1].get_Buffer().size() == 2){
-//                                System.out.println("Waiting...");
-//                            }
-
-                            // Send component 3 to component 3
+                        if (!attachedWorkstations[1].isBufferFull()) {
+                            x++;
+                            double time = (-1/lambdas[1]) * Math.log(rand.nextDouble());
                             attachedWorkstations[1].add_Component(new Component("C3"));
+                            System.out.println(time);
+                        } else {
+                            //System.out.println("Waiting...");
                         }
+
+
                     }
                     rnd = rand.nextInt(100);
                 }

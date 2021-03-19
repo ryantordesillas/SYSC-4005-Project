@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Random;
 
 
 public class Workstation extends Thread{
@@ -22,8 +23,8 @@ public class Workstation extends Thread{
     /** C1 Buffer for C1 component */
     private ArrayList<Component> C1_buffer;
 
-    /** File for the processing time **/
-    private File service_file;
+    /** lambda for the processing time **/
+    private double lambda;
 
     /** Created Product Count */
     private int product_count = 0;
@@ -31,16 +32,16 @@ public class Workstation extends Thread{
     boolean extra_component_flag = false;
     /**
      * The default constructor for the Workstation
-     * @param file The file containing the processing times
+     * @param lambda The value used to determine processing times
      * @param extra_component_flag flag to determine if a 2nd component is needed
      * @param extra_component the extra component if the extra_component_flag is true
      */
-    public Workstation(File file, boolean extra_component_flag, Component extra_component){
+    public Workstation(double lambda, boolean extra_component_flag, Component extra_component){
 
         // Create the ArrayList that the Workstation will use
         C1_buffer = new ArrayList<Component>();
 
-        service_file = file;
+        this.lambda = lambda;
 
         // Create a buffer if there needs to be an extra component for workstations W2 and W3
         if (extra_component_flag){
@@ -65,35 +66,29 @@ public class Workstation extends Thread{
 
     public void run(){
 
+        Random rnd = new Random();
         if(!extra_component_flag){
-            try {
-                BufferedReader br = new BufferedReader(new FileReader(service_file));
-                while(true) {
+            while(true) {
 
-                    if(C1_buffer.size() >= 1) {
-                        String st1 = br.readLine();
-                        System.out.println("Workstation 1:Process Time: " + st1);
-                        C1_buffer.remove(0);
-                        product_count++;
-                    }
+                if(C1_buffer.size() >= 1) {
+                    double time = (-1/lambda) * Math.log(rnd.nextDouble());
+                    System.out.println("Workstation 1:Process Time: " + time);
+                    System.out.println("C1 Buffer Size: " + C1_buffer.size());
+                    C1_buffer.remove(0);
+                    product_count++;
                 }
-
-            } catch (Exception e) {
-                e.printStackTrace();
             }
-
-
-        }
-        else{
+        }else{
 
             try {
-                BufferedReader br = new BufferedReader(new FileReader(service_file));
                 while(true) {
 
                     if(C1_buffer.size() >= 1 && buffer.size() >= 1) {
 
-                        String st1 = br.readLine();
-                        System.out.println("Workstation 2 or 3 Process Time: " + st1);
+                        double time = (-1/lambda) * Math.log(rnd.nextDouble());
+                        System.out.println("Workstation 2 or 3 Process Time: " + time);
+                        System.out.println("C1 Buffer Size: " + C1_buffer.size());
+                        System.out.println("Other component Buffer Size: " + buffer.size());
                         C1_buffer.remove(0);
                         buffer.remove(0);
                         product_count++;
