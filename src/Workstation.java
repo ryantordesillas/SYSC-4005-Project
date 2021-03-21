@@ -70,33 +70,47 @@ public class Workstation extends Thread{
         if(!extra_component_flag){
             while(true) {
 
-                if(C1_buffer.size() >= 1) {
+                // Check if the buffer is not empty or full
+                if(C1_buffer.size() <= 2 && C1_buffer.size() > 0) {
                     double time = (-1/lambda) * Math.log(rnd.nextDouble());
-                    System.out.println("Workstation 1:Process Time: " + time);
+
+                    // Separate into miliseconds and nanoseconds
+                    int mili = (int) time;
+                    int nano = (int) ((time - mili) * 100);
+                    try {
+                        // Multiply by 1000 to change it to seconds.milliseconds
+                        sleep(mili,nano);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("Workstation 1:Process Time: " + mili + "." + nano);
                     System.out.println("C1 Buffer Size: " + C1_buffer.size());
                     C1_buffer.remove(0);
                     product_count++;
+
                 }
             }
         }else{
+            while(true) {
 
-            try {
-                while(true) {
+                if(C1_buffer.size() <= 2 && buffer.size() <= 2 && buffer.size() > 0 && C1_buffer.size() >0) {
 
-                    if(C1_buffer.size() >= 1 && buffer.size() >= 1) {
-
-                        double time = (-1/lambda) * Math.log(rnd.nextDouble());
-                        System.out.println("Workstation 2 or 3 Process Time: " + time);
-                        System.out.println("C1 Buffer Size: " + C1_buffer.size());
-                        System.out.println("Other component Buffer Size: " + buffer.size());
-                        C1_buffer.remove(0);
-                        buffer.remove(0);
-                        product_count++;
+                    double time = (-1/lambda) * Math.log(rnd.nextDouble());
+                    int mili = (int) time;
+                    int nano = (int) ((time - mili) * 100);
+                    try {
+                        // Multiply by 1000 to change it to seconds.milliseconds
+                        sleep(mili,nano);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
+                    System.out.println("Workstation 2 or 3 Process Time: " + time);
+                    System.out.println("C1 Buffer Size: " + C1_buffer.size());
+                    System.out.println("Other component Buffer Size: " + buffer.size());
+                    C1_buffer.remove(0);
+                    buffer.remove(0);
+                    product_count++;
                 }
-
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
 

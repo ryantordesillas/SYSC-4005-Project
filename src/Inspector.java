@@ -49,6 +49,8 @@ public class Inspector extends Thread{
                 if (!availableWorkstation.isC1Full()){
                     availableWorkstation.add_Component(new Component("C1"));
                     x++;
+                } else {
+
                 }
             }
 
