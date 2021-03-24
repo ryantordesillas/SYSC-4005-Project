@@ -38,7 +38,7 @@ public class Inspector extends Thread{
 
             // This will be used for Inspector 1
             int x = 0;
-            while (x <= 200) {
+            while (!attachedWorkstations[0].isDone() || !attachedWorkstations[1].isDone() || !attachedWorkstations[2].isDone()) {
                 //System.out.println(st);
                 double time = (-1 / lambdas[0]) * Math.log(rnd.nextDouble());
 //                System.out.println(time);
@@ -53,6 +53,8 @@ public class Inspector extends Thread{
 
                 }
             }
+            System.out.println("Iterations: "+ x);
+
 
         } else { // there are two components being inspected
             try{
@@ -65,12 +67,12 @@ public class Inspector extends Thread{
 
 
                 int x = 0;
-                while(x <= 200){
+                while(!attachedWorkstations[0].isDone() || !attachedWorkstations[1].isDone()){
                     // This will need to be tweaked as it will continue until both files are completely read
                     if(rnd <= 49){
                         //tba: if str is null while waiting for the other list, do not send a component
 
-                        if (!attachedWorkstations[0].isBufferFull()) {
+                        if (!attachedWorkstations[0].isBufferFull() && !attachedWorkstations[0].isDone()) {
                             x++;
                             double time = (-1/lambdas[0]) * Math.log(rand.nextDouble());
                             attachedWorkstations[0].add_Component(new Component("C2"));
@@ -82,7 +84,7 @@ public class Inspector extends Thread{
                     } else {
 
 
-                        if (!attachedWorkstations[1].isBufferFull()) {
+                        if (!attachedWorkstations[1].isBufferFull() && !attachedWorkstations[1].isDone()) {
                             x++;
                             double time = (-1/lambdas[1]) * Math.log(rand.nextDouble());
                             attachedWorkstations[1].add_Component(new Component("C3"));
@@ -113,12 +115,12 @@ public class Inspector extends Thread{
 
         // Workstation 1 has the smallest queue
         // NOTE: in case of a tie, workstation 1 has the highest priority
-        if(attachedWorkstations[0].getC1_buffer().size() <= attachedWorkstations[1].getC1_buffer().size() && attachedWorkstations[0].getC1_buffer().size() <= attachedWorkstations[2].getC1_buffer().size()){
+        if(attachedWorkstations[0].getC1_buffer().size() <= attachedWorkstations[1].getC1_buffer().size() && attachedWorkstations[0].getC1_buffer().size() <= attachedWorkstations[2].getC1_buffer().size() && !attachedWorkstations[0].isDone()){
             //System.out.println("Sent to Workstation 1");
             return attachedWorkstations[0];
         }
         // Workstation 2 has the smallest queue
-        else if(attachedWorkstations[1].getC1_buffer().size() <= attachedWorkstations[0].getC1_buffer().size() && attachedWorkstations[1].getC1_buffer().size() <= attachedWorkstations[2].getC1_buffer().size()){
+        else if(attachedWorkstations[1].getC1_buffer().size() <= attachedWorkstations[0].getC1_buffer().size() && attachedWorkstations[1].getC1_buffer().size() <= attachedWorkstations[2].getC1_buffer().size() && !attachedWorkstations[1].isDone()){
             //System.out.println("Sent to Workstation 2");
             return attachedWorkstations[1];
         } else {

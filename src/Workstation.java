@@ -7,6 +7,8 @@ import java.util.Random;
 
 public class Workstation extends Thread{
 
+    private boolean done = false;
+
     /**
      * The Created product will be stored as a string for counting purposes
      */
@@ -68,50 +70,52 @@ public class Workstation extends Thread{
 
         Random rnd = new Random();
         if(!extra_component_flag){
-            while(true) {
+            while(product_count < 200) {
 
                 // Check if the buffer is not empty or full
                 if(C1_buffer.size() <= 2 && C1_buffer.size() > 0) {
                     double time = (-1/lambda) * Math.log(rnd.nextDouble());
 
                     // Separate into miliseconds and nanoseconds
-                    int mili = (int) time;
-                    int nano = (int) ((time - mili) * 100);
-                    try {
-                        // Multiply by 1000 to change it to seconds.milliseconds
-                        sleep(mili,nano);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    System.out.println("Workstation 1:Process Time: " + mili + "." + nano);
-                    System.out.println("C1 Buffer Size: " + C1_buffer.size());
+//                    int mili = (int) time;
+//                    int nano = (int) ((time - mili) * 100);
+//                    try {
+//                        // Multiply by 1000 to change it to seconds.milliseconds
+//                        sleep(mili,nano);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    System.out.println("Workstation 1:Process Time: " + mili + "." + nano);
+//                    System.out.println("C1 Buffer Size: " + C1_buffer.size());
                     C1_buffer.remove(0);
                     product_count++;
 
                 }
             }
+            done = true;
         }else{
-            while(true) {
+            while(product_count < 200) {
 
                 if(C1_buffer.size() <= 2 && buffer.size() <= 2 && buffer.size() > 0 && C1_buffer.size() >0) {
 
                     double time = (-1/lambda) * Math.log(rnd.nextDouble());
-                    int mili = (int) time;
-                    int nano = (int) ((time - mili) * 100);
-                    try {
-                        // Multiply by 1000 to change it to seconds.milliseconds
-                        sleep(mili,nano);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    System.out.println("Workstation 2 or 3 Process Time: " + time);
-                    System.out.println("C1 Buffer Size: " + C1_buffer.size());
-                    System.out.println("Other component Buffer Size: " + buffer.size());
+//                    int mili = (int) time;
+//                    int nano = (int) ((time - mili) * 100);
+//                    try {
+//                        // Multiply by 1000 to change it to seconds.milliseconds
+//                        sleep(mili,nano);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    System.out.println("Workstation 2 or 3 Process Time: " + time);
+//                    System.out.println("C1 Buffer Size: " + C1_buffer.size());
+//                    System.out.println("Other component Buffer Size: " + buffer.size());
                     C1_buffer.remove(0);
                     buffer.remove(0);
                     product_count++;
                 }
             }
+            done = true;
         }
 
     }
@@ -165,5 +169,9 @@ public class Workstation extends Thread{
 
     public int getProduct_count() {
         return product_count;
+    }
+
+    public boolean isDone() {
+        return done;
     }
 }
