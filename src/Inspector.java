@@ -63,9 +63,10 @@ public class Inspector extends Thread {
                         e.printStackTrace();
                     }
                 }
-
+                double start = System.nanoTime();
                 // Find the most available workstation
                 Workstation availableWorkstation = findAvailableWorkstation();
+                System.out.println(availableWorkstation.isC1Full());
 
                 if(!availableWorkstation.isDone()&& !availableWorkstation.isC1Full()) {
 
@@ -73,15 +74,14 @@ public class Inspector extends Thread {
 
                         while (availableWorkstation.isC1Full()) {
                             try {
-                                long startTime = System.nanoTime();
                                 this.wait();
-                                long endTime = System.nanoTime();
-                                c.setDelay_time(endTime-startTime);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
                         }
                     }
+
+                    c.setDelay_time(System.nanoTime() - start);
                     c.setQueue_time(System.nanoTime());
                     availableWorkstation.add_Component(c);
                     x++;
@@ -103,7 +103,7 @@ public class Inspector extends Thread {
             int x = 0;
             while (!attachedWorkstations[0].isDone() || !attachedWorkstations[1].isDone()) {
                 // This will need to be tweaked as it will continue until both files are completely read
-                if (rnd <= 49 && !attachedWorkstations[0].isDone() && !attachedWorkstations[0].isBufferFull()) {
+                if (rnd <= 49 && !attachedWorkstations[0].isDone()) {
                     double time = (-1 / lambdas[0]) * Math.log(rand.nextDouble());
                     int milli = (int) time;
                     int nano = (int) ((time - milli) * 1000000);
@@ -117,8 +117,8 @@ public class Inspector extends Thread {
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-
-                        while (attachedWorkstations[0].isBufferFull()){
+                        //System.out.println(attachedWorkstations[0].getBuffer().size());
+                        while (attachedWorkstations[0].isBufferFull() && !attachedWorkstations[0].isDone()){
                             try {
                                 long startTime = System.nanoTime();
                                 this.wait();
@@ -144,7 +144,7 @@ public class Inspector extends Thread {
 //                    }
 
                 } else {
-                    if(!attachedWorkstations[1].isDone() && !attachedWorkstations[1].isBufferFull()) {
+                    if(!attachedWorkstations[1].isDone()) {
                         double time = (-1 / lambdas[1]) * Math.log(rand.nextDouble());
                         int milli = (int) time;
                         int nano = (int) ((time - milli) * 1000000);
@@ -160,7 +160,7 @@ public class Inspector extends Thread {
                                 e.printStackTrace();
                             }
 
-                            while (attachedWorkstations[1].isBufferFull()) {
+                            while (attachedWorkstations[1].isBufferFull() && !attachedWorkstations[1].isDone()) {
                                 try {
                                     long startTime = System.nanoTime();
                                     this.wait();
@@ -176,18 +176,6 @@ public class Inspector extends Thread {
                         attachedWorkstations[1].add_Component(c);
                         x++;
                     }
-
-//                    if (!attachedWorkstations[1].isBufferFull() && !attachedWorkstations[1].isDone()) {
-//                        x++;
-//                        double time = (-1 / lambdas[1]) * Math.log(rand.nextDouble());
-//                        int milli = (int) time;
-//                        int nano = (int) ((time - milli) * 100);
-//                        attachedWorkstations[1].add_Component(new Component("C3"));
-//
-//                        //System.out.println(time);
-//                    } else {
-//                        //System.out.println("Waiting...");
-//                    }
 
 
                 }
