@@ -116,7 +116,7 @@ public class Workstation extends Thread{
 
                     double time = (-1/lambda) * Math.log(rnd.nextDouble());
                     int milli = (int) time;
-                    int nano = (int) ((time - milli) * 100);
+                    int nano = (int) ((time - milli) * 1000000);
 
                     synchronized (this){
                         try {

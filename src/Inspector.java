@@ -48,7 +48,11 @@ public class Inspector extends Thread {
 //                System.out.println(time);
 
                 int milli = (int) time;
-                int nano = (int) ((time - milli) * 100);
+                int nano = (int) ((time - milli) * 1000000);
+
+                // Create a component now so we can track all of the times
+                Component c = new Component("C1");
+                c.setInspection_time(time);
 
                 // Do the processing first before picking a available workstation
                 synchronized (this){
@@ -68,24 +72,20 @@ public class Inspector extends Thread {
 
                         while (availableWorkstation.isC1Full()) {
                             try {
+                                long startTime = System.nanoTime();
                                 this.wait();
+                                long endTime = System.nanoTime();
+                                c.setDelay_time(endTime-startTime);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
                         }
                     }
-
-                    availableWorkstation.add_Component(new Component("C1"));
+                    c.setQueue_time(System.nanoTime());
+                    availableWorkstation.add_Component(c);
                     x++;
                     //System.out.println("sent");
                 }
-//                if(!availableWorkstation.isC1Full()) {
-//                    availableWorkstation.add_Component(new Component("C1"));
-//                    x++;
-//                    System.out.println("sent");
-//                } else {
-//
-//                }
             }
             System.out.println("C1 Iterations: " + x);
 
@@ -105,8 +105,9 @@ public class Inspector extends Thread {
                 if (rnd <= 49 && !attachedWorkstations[0].isDone() && !attachedWorkstations[0].isBufferFull()) {
                     double time = (-1 / lambdas[0]) * Math.log(rand.nextDouble());
                     int milli = (int) time;
-                    int nano = (int) ((time - milli) * 100);
-
+                    int nano = (int) ((time - milli) * 1000000);
+                    Component c = new Component("C2");
+                    c.setInspection_time(time);
 
                     synchronized (this) {
 
@@ -118,14 +119,17 @@ public class Inspector extends Thread {
 
                         while (attachedWorkstations[0].isBufferFull()){
                             try {
-                                System.out.println("Waiting...");
+                                long startTime = System.nanoTime();
                                 this.wait();
+                                long endTime = System.nanoTime();
+                                c.setDelay_time(time);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
                         }
                     }
-                    attachedWorkstations[0].add_Component(new Component("C2"));
+                    c.setQueue_time(System.nanoTime());
+                    attachedWorkstations[0].add_Component(c);
                     x++;
 
 //                    if (!attachedWorkstations[0].isBufferFull() && !attachedWorkstations[0].isDone()) {
@@ -142,14 +146,14 @@ public class Inspector extends Thread {
                     if(!attachedWorkstations[1].isDone() && !attachedWorkstations[1].isBufferFull()) {
                         double time = (-1 / lambdas[1]) * Math.log(rand.nextDouble());
                         int milli = (int) time;
-                        int nano = (int) ((time - milli) * 100);
+                        int nano = (int) ((time - milli) * 1000000);
+                        Component c = new Component("C3");
+                        c.setInspection_time(time);
+
 
                         synchronized (this) {
 
-
-
                             try {
-                                System.out.println("Waiting...");
                                 this.wait(milli,nano);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
@@ -157,13 +161,18 @@ public class Inspector extends Thread {
 
                             while (attachedWorkstations[1].isBufferFull()) {
                                 try {
+                                    long startTime = System.nanoTime();
                                     this.wait();
+                                    long endTime = System.nanoTime();
+                                    c.setDelay_time(time);
+
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
                             }
                         }
-                        attachedWorkstations[1].add_Component(new Component("C3"));
+                        c.setQueue_time(System.nanoTime());
+                        attachedWorkstations[1].add_Component(c);
                         x++;
                     }
 
