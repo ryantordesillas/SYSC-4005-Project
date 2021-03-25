@@ -57,7 +57,7 @@ public class Inspector extends Thread {
                 // Do the processing first before picking a available workstation
                 synchronized (this){
                     try {
-                        System.out.println("Waiting...");
+                        //System.out.println("Waiting...");
                         this.wait(milli,nano);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -68,6 +68,7 @@ public class Inspector extends Thread {
                 Workstation availableWorkstation = findAvailableWorkstation();
 
                 if(!availableWorkstation.isDone()&& !availableWorkstation.isC1Full()) {
+
                     synchronized (this) {
 
                         while (availableWorkstation.isC1Full()) {
@@ -214,9 +215,19 @@ public class Inspector extends Thread {
         else if(attachedWorkstations[1].getC1_buffer().size() <= attachedWorkstations[0].getC1_buffer().size() && attachedWorkstations[1].getC1_buffer().size() <= attachedWorkstations[2].getC1_buffer().size() && !attachedWorkstations[1].isDone()){
             //System.out.println("Sent to Workstation 2");
             return attachedWorkstations[1];
-        } else {
+        } else if (attachedWorkstations[2].getC1_buffer().size() <= attachedWorkstations[0].getC1_buffer().size() && attachedWorkstations[2].getC1_buffer().size() <= attachedWorkstations[1].getC1_buffer().size() && !attachedWorkstations[2].isDone()){
             //System.out.println("Sent to Workstation 3");
             return attachedWorkstations[2];
+        } else {
+            // Send it to the workstation that isn't done starting with 1
+            if (!attachedWorkstations[0].isDone()){
+                return attachedWorkstations[0];
+            }
+            else if(!attachedWorkstations[1].isDone()){
+                return attachedWorkstations[1];
+            } else {
+                return attachedWorkstations[2];
+            }
         }
 
     }

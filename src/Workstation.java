@@ -34,6 +34,9 @@ public class Workstation extends Thread{
     /** Created Product Count */
     private int product_count = 0;
 
+    /** Stats for the components */
+    private Statistic stat;
+
     boolean extra_component_flag = false;
     /**
      * The default constructor for the Workstation
@@ -41,7 +44,7 @@ public class Workstation extends Thread{
      * @param extra_component_flag flag to determine if a 2nd component is needed
      * @param extra_component the extra component if the extra_component_flag is true
      */
-    public Workstation(double lambda, boolean extra_component_flag, Component extra_component){
+    public Workstation(double lambda, boolean extra_component_flag, Component extra_component, Statistic stat){
 
         // Create the ArrayList that the Workstation will use
         C1_buffer = new ArrayList<Component>();
@@ -56,6 +59,7 @@ public class Workstation extends Thread{
         }
 
         attached_inspectors = new ArrayList<Inspector>();
+        this.stat = stat;
 
     }
 
@@ -78,10 +82,27 @@ public class Workstation extends Thread{
             while(product_count < 50) {
 
                 // Check if the buffer is not empty or full
-                if(C1_buffer.size() <= 2 && C1_buffer.size() > 0) {
+                if(C1_buffer.size() == 2 && C1_buffer.size() > 0) {
+
+                    // Get the component and beginning of the ArrayList
+                    Component c1 = C1_buffer.get(0);
+                    Component c2 = C1_buffer.get(1);
+
+                    // End the queue time
+                    double queue_start_time1 = c1.getQueue_time();
+                    double queue_start_time2 = c2.getQueue_time();
+                    c1.setQueue_time(System.nanoTime() - queue_start_time1);
+                    c2.setQueue_time(System.nanoTime() - queue_start_time2);
+
+                    // Generate a exponential time for processing time
                     double time = (-1/lambda) * Math.log(rnd.nextDouble());
+
+                    c1.setProcessing_time(time);
+                    c2.setProcessing_time(time);
+
                     int milli = (int) time;
-                    int nano = (int) ((time - milli) * 100);
+                    int nano = (int) ((time - milli) * 1000000);
+
 
                     synchronized (this){
                         try {
@@ -92,9 +113,10 @@ public class Workstation extends Thread{
                         }
                     }
 
+                    stat.processP1(c1,c2);
 
-
-                    C1_buffer.remove(0);
+                    // Clear the buffer because the buffer will take 2 components
+                    C1_buffer.clear();
                     product_count++;
 
                 }
@@ -114,9 +136,22 @@ public class Workstation extends Thread{
 
                 if(C1_buffer.size() <= 2 && buffer.size() <= 2 && buffer.size() > 0 && C1_buffer.size() >0) {
 
+                    Component c1 = C1_buffer.get(0);
+                    Component buffer_component = buffer.get(0);
+
+                    // End the queue time
+                    double queue_start_time1 = c1.getQueue_time();
+                    double queue_start_time2 = buffer_component.getQueue_time();
+                    c1.setQueue_time(System.nanoTime() - queue_start_time1);
+                    buffer_component.setQueue_time(System.nanoTime() - queue_start_time2);
+
                     double time = (-1/lambda) * Math.log(rnd.nextDouble());
                     int milli = (int) time;
                     int nano = (int) ((time - milli) * 1000000);
+
+
+                    c1.setProcessing_time(time);
+                    buffer_component.setProcessing_time(time);
 
                     synchronized (this){
                         try {
@@ -126,6 +161,8 @@ public class Workstation extends Thread{
                             e.printStackTrace();
                         }
                     }
+
+                    stat.processProduct(buffer_component.getType(),c1,buffer_component);
 
                     C1_buffer.remove(0);
                     buffer.remove(0);
