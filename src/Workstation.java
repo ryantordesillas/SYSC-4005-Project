@@ -7,7 +7,10 @@ import java.util.Random;
 
 public class Workstation extends Thread{
 
+    // Boolean to determine if the appropriate amount of products have been made
     private boolean done = false;
+
+    private ArrayList<Inspector> attached_inspectors;
 
     /**
      * The Created product will be stored as a string for counting purposes
@@ -52,6 +55,8 @@ public class Workstation extends Thread{
             this.extra_component_flag = true;
         }
 
+        attached_inspectors = new ArrayList<Inspector>();
+
     }
 
 
@@ -70,53 +75,89 @@ public class Workstation extends Thread{
 
         Random rnd = new Random();
         if(!extra_component_flag){
-            while(product_count < 200) {
+            while(product_count < 50) {
 
                 // Check if the buffer is not empty or full
                 if(C1_buffer.size() <= 2 && C1_buffer.size() > 0) {
                     double time = (-1/lambda) * Math.log(rnd.nextDouble());
+                    int milli = (int) time;
+                    int nano = (int) ((time - milli) * 100);
 
-                    // Separate into miliseconds and nanoseconds
-//                    int mili = (int) time;
-//                    int nano = (int) ((time - mili) * 100);
-//                    try {
-//                        // Multiply by 1000 to change it to seconds.milliseconds
-//                        sleep(mili,nano);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                    System.out.println("Workstation 1:Process Time: " + mili + "." + nano);
-//                    System.out.println("C1 Buffer Size: " + C1_buffer.size());
+                    synchronized (this){
+                        try {
+                            //System.out.println("Creating product...");
+                            this.wait(milli,nano);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+
+
                     C1_buffer.remove(0);
                     product_count++;
 
                 }
+
+                // Do a check to see if inspector 1 is waiting
+                if(!isC1Full() && attached_inspectors.get(0).getState() == State.WAITING){
+                    synchronized (attached_inspectors.get(0)) {
+                        attached_inspectors.get(0).notify();
+                    }
+                }
+
+
+
             }
-            done = true;
         }else{
-            while(product_count < 200) {
+            while(product_count < 50) {
 
                 if(C1_buffer.size() <= 2 && buffer.size() <= 2 && buffer.size() > 0 && C1_buffer.size() >0) {
 
                     double time = (-1/lambda) * Math.log(rnd.nextDouble());
-//                    int mili = (int) time;
-//                    int nano = (int) ((time - mili) * 100);
-//                    try {
-//                        // Multiply by 1000 to change it to seconds.milliseconds
-//                        sleep(mili,nano);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                    System.out.println("Workstation 2 or 3 Process Time: " + time);
-//                    System.out.println("C1 Buffer Size: " + C1_buffer.size());
-//                    System.out.println("Other component Buffer Size: " + buffer.size());
+                    int milli = (int) time;
+                    int nano = (int) ((time - milli) * 100);
+
+                    synchronized (this){
+                        try {
+                            //System.out.println("Creating product...");
+                            this.wait(milli,nano);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
                     C1_buffer.remove(0);
                     buffer.remove(0);
                     product_count++;
                 }
+
+                //check if inspectors are waiting
+                // Do a check to see if inspector 1 is waiting
+                if(!isC1Full()){
+                    for(Inspector i: attached_inspectors){
+                        if(i.getState() == State.WAITING) {
+                            synchronized (i) {
+                                i.notify();
+                            }
+                        }
+                    }
+                }
+
+                // check if inspectors are waiting on buffer
+                if(!isBufferFull()){
+                    for(Inspector i: attached_inspectors){
+                        if(i.getState() == State.WAITING) {
+                            synchronized (i) {
+                                i.notify();
+                            }
+                        }
+                    }
+                }
+
             }
-            done = true;
         }
+        done = true;
 
     }
 
@@ -154,14 +195,14 @@ public class Workstation extends Thread{
     }
 
     public boolean isC1Full(){
-        if (C1_buffer.size() == 2){
+        if (C1_buffer.size() >= 2){
             return true;
         }
         return false;
     }
 
     public boolean isBufferFull(){
-        if (buffer.size() == 2){
+        if (buffer.size() >= 2){
             return true;
         }
         return false;
@@ -173,5 +214,9 @@ public class Workstation extends Thread{
 
     public boolean isDone() {
         return done;
+    }
+
+    public void addInspector(Inspector i){
+        attached_inspectors.add(i);
     }
 }

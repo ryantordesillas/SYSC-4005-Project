@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Random;
 import java.lang.Math;
 
@@ -33,6 +34,13 @@ public class Simulation{
         // There will be 2 Inspectors
         Inspector ins1 = new Inspector(cpBuffer1,workBuffer1, lambdas1);
         Inspector ins2 = new Inspector(cpBuffer2, workBuffer2, lambdas2);
+
+        // Attach a array of inspectors attached to a workstation
+        work1.addInspector(ins1);
+        work2.addInspector(ins1);
+        work3.addInspector(ins1);
+        work2.addInspector(ins2);
+        work3.addInspector(ins2);
 
         work1.start();
         work2.start();

@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.Random;
 import java.lang.Math;
 
-public class Inspector extends Thread{
+public class Inspector extends Thread {
 
     /**
      * The components that this Inspector inspects
@@ -14,24 +14,28 @@ public class Inspector extends Thread{
      */
     private Workstation[] attachedWorkstations;
 
-    /** lambda used to generate random numbers */
+    /**
+     * lambda used to generate random numbers
+     */
     private double[] lambdas;
+
 
     /**
      * The default constructor for the Inspector Object
-     * @param components The components that this
+     *
+     * @param components   The components that this
      * @param workstations the workstations attached to the
-     * @param lambdas the lambdas that will be used in the random number generation
+     * @param lambdas      the lambdas that will be used in the random number generation
      */
-    public Inspector(Component[] components, Workstation[] workstations, double[] lambdas){
+    public Inspector(Component[] components, Workstation[] workstations, double[] lambdas) {
         inspectComponents = components;
         attachedWorkstations = workstations;
         this.lambdas = lambdas;
     }
 
-    public void run(){
+    public void run() {
         // if there is one file no need for random variables
-        if (lambdas.length == 1){
+        if (lambdas.length == 1) {
 
             // Create a random number generator to generate doubles
             Random rnd = new Random();
@@ -43,68 +47,146 @@ public class Inspector extends Thread{
                 double time = (-1 / lambdas[0]) * Math.log(rnd.nextDouble());
 //                System.out.println(time);
 
+                int milli = (int) time;
+                int nano = (int) ((time - milli) * 100);
+
+                // Do the processing first before picking a available workstation
+                synchronized (this){
+                    try {
+                        System.out.println("Waiting...");
+                        this.wait(milli,nano);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 // Find the most available workstation
                 Workstation availableWorkstation = findAvailableWorkstation();
 
-                if (!availableWorkstation.isC1Full()){
+                if(!availableWorkstation.isDone()&& !availableWorkstation.isC1Full()) {
+                    synchronized (this) {
+
+                        while (availableWorkstation.isC1Full()) {
+                            try {
+                                this.wait();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
                     availableWorkstation.add_Component(new Component("C1"));
                     x++;
-                } else {
-
+                    //System.out.println("sent");
                 }
+//                if(!availableWorkstation.isC1Full()) {
+//                    availableWorkstation.add_Component(new Component("C1"));
+//                    x++;
+//                    System.out.println("sent");
+//                } else {
+//
+//                }
             }
-            System.out.println("Iterations: "+ x);
+            System.out.println("C1 Iterations: " + x);
 
 
         } else { // there are two components being inspected
-            try{
 
-                // use a random number to determine which file to read from
-                Random rand = new Random();
+            // use a random number to determine which file to read from
+            Random rand = new Random();
 
-                // Use integers from 0-99
-                int rnd = rand.nextInt(100);
+            // Use integers from 0-99
+            int rnd = rand.nextInt(100);
 
 
-                int x = 0;
-                while(!attachedWorkstations[0].isDone() || !attachedWorkstations[1].isDone()){
-                    // This will need to be tweaked as it will continue until both files are completely read
-                    if(rnd <= 49){
-                        //tba: if str is null while waiting for the other list, do not send a component
+            int x = 0;
+            while (!attachedWorkstations[0].isDone() || !attachedWorkstations[1].isDone()) {
+                // This will need to be tweaked as it will continue until both files are completely read
+                if (rnd <= 49 && !attachedWorkstations[0].isDone() && !attachedWorkstations[0].isBufferFull()) {
+                    double time = (-1 / lambdas[0]) * Math.log(rand.nextDouble());
+                    int milli = (int) time;
+                    int nano = (int) ((time - milli) * 100);
 
-                        if (!attachedWorkstations[0].isBufferFull() && !attachedWorkstations[0].isDone()) {
-                            x++;
-                            double time = (-1/lambdas[0]) * Math.log(rand.nextDouble());
-                            attachedWorkstations[0].add_Component(new Component("C2"));
-//                            System.out.println(time);
-                        } else {
-                            //System.out.println("Waiting...");
+
+                    synchronized (this) {
+
+                        try {
+                            this.wait(milli,nano);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
 
-                    } else {
-
-
-                        if (!attachedWorkstations[1].isBufferFull() && !attachedWorkstations[1].isDone()) {
-                            x++;
-                            double time = (-1/lambdas[1]) * Math.log(rand.nextDouble());
-                            attachedWorkstations[1].add_Component(new Component("C3"));
-                            System.out.println(time);
-                        } else {
-                            //System.out.println("Waiting...");
+                        while (attachedWorkstations[0].isBufferFull()){
+                            try {
+                                System.out.println("Waiting...");
+                                this.wait();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
-
-
                     }
-                    rnd = rand.nextInt(100);
+                    attachedWorkstations[0].add_Component(new Component("C2"));
+                    x++;
+
+//                    if (!attachedWorkstations[0].isBufferFull() && !attachedWorkstations[0].isDone()) {
+//                        x++;
+//                        double time = (-1 / lambdas[0]) * Math.log(rand.nextDouble());
+//                        attachedWorkstations[0].add_Component(new Component("C2"));
+//
+//                            System.out.println(time);
+//                    } else {
+//
+//                    }
+
+                } else {
+                    if(!attachedWorkstations[1].isDone() && !attachedWorkstations[1].isBufferFull()) {
+                        double time = (-1 / lambdas[1]) * Math.log(rand.nextDouble());
+                        int milli = (int) time;
+                        int nano = (int) ((time - milli) * 100);
+
+                        synchronized (this) {
+
+
+
+                            try {
+                                System.out.println("Waiting...");
+                                this.wait(milli,nano);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+
+                            while (attachedWorkstations[1].isBufferFull()) {
+                                try {
+                                    this.wait();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                        attachedWorkstations[1].add_Component(new Component("C3"));
+                        x++;
+                    }
+
+//                    if (!attachedWorkstations[1].isBufferFull() && !attachedWorkstations[1].isDone()) {
+//                        x++;
+//                        double time = (-1 / lambdas[1]) * Math.log(rand.nextDouble());
+//                        int milli = (int) time;
+//                        int nano = (int) ((time - milli) * 100);
+//                        attachedWorkstations[1].add_Component(new Component("C3"));
+//
+//                        //System.out.println(time);
+//                    } else {
+//                        //System.out.println("Waiting...");
+//                    }
+
+
                 }
-                System.out.println("Iterations: "+ x);
-
-
-
-
-            } catch(Exception e){
-                e.printStackTrace();
+                rnd = rand.nextInt(100);
             }
+            System.out.println("Other Iterations: " + x);
+
+
+
         }
     }
 
