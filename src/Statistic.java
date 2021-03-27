@@ -57,6 +57,11 @@ public class Statistic {
     /** Total inspection time of component 3 */
     private double c3_inspecting = 0;
 
+    /** Total time inspector 1 runs */
+    private double ins1_run_time;
+
+    /** Total time inspector 1 runs */
+    private double ins2_run_time;
 
     public Statistic(){
 
@@ -124,6 +129,22 @@ public class Statistic {
         }
     }
 
+    public void ins1_start(){
+        ins1_run_time = System.nanoTime();
+    }
+
+    public void ins1_end() {
+        ins1_run_time = System.nanoTime() - ins1_run_time;
+    }
+
+    public void ins2_start(){
+        ins2_run_time = System.nanoTime();
+    }
+
+    public void ins2_end() {
+        ins2_run_time = System.nanoTime() - ins2_run_time;
+    }
+
     public void generateReport() {
         String out = "";
         out += "======================== Count Information ========================\n";
@@ -136,18 +157,32 @@ public class Statistic {
         out += "\n===================================================================\n\n";
         out += "======================== C2 Information ========================\n";
         out += "Average inspecting time: " + (c2_inspecting / C2_Count);
-        out += "\nAverage delay time: "+ (c2_delay / C2_Count);
+        out += "\nAverage delay time: "+ (c2_delay / C2_Count)/1000000;
         out += "\nAverage queue time: "+ (c2_queue / C2_Count)/1000000;
         out += "\n===================================================================\n\n";
         out += "======================== C3 Information ========================\n";
         out += "Average inspecting time: " + (c3_inspecting / C3_Count);
-        out += "\nAverage delay time: "+ (c3_delay / C3_Count);
+        out += "\nAverage delay time: "+ (c3_delay / C3_Count)/1000000;
         out += "\nAverage queue time: "+ (c3_queue / C3_Count)/1000000;
         out += "\n===================================================================\n\n";
         out += "======================== Product Processing Time ========================\n";
         out += "Average processing time for P1: " + (p1_processing / P1_Count);
         out += "\nAverage processing time for P2: " + (p2_processing / P2_Count);
         out += "\nAverage processing time for P3: " + (p3_processing / P3_Count);
+        out += "\n===================================================================\n\n";
+        out += "======================== Inspector 1 Stats ========================\n";
+        out += "Total inspection time: " + (c1_inspecting);
+        out += "\nTotal delayed time: " + (c1_delay)/1000000;
+        out += "\nTotal run time: " + (ins1_run_time)/1000000;
+        out += "\nTotal time: " + (total_simulation_time)/1000000;
+        out += "\nUtilization for Inspector 1: " + ((c1_inspecting * 1000000) / ins1_run_time)*100; // the inspection time will need to be multiplied by 1000000 because it is tracked in milliseconds
+        out += "\n===================================================================\n\n";
+        out += "======================== Inspector 2 Stats ========================\n";
+        out += "Total inspection time: " + (c2_inspecting + c3_inspecting);
+        out += "\nTotal delayed time: " + (c2_delay + c3_delay)/1000000;
+        out += "\nTotal run time: " + (ins2_run_time)/1000000;
+        out += "\nTotal time: " + (total_simulation_time)/1000000;
+        out += "\nUtilization for Inspector 2: " + (((c2_inspecting + c3_inspecting)*1000000)/ ins2_run_time)*100;
         out += "\n===================================================================\n\n";
 
         System.out.println(out);

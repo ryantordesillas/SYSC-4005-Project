@@ -37,8 +37,8 @@ public class Simulation{
         double[] lambdas1 = {0.09654457318};
         double[] lambdas2 = {0.06436288999,0.04846662112};
         // There will be 2 Inspectors
-        Inspector ins1 = new Inspector(cpBuffer1,workBuffer1, lambdas1);
-        Inspector ins2 = new Inspector(cpBuffer2, workBuffer2, lambdas2);
+        Inspector ins1 = new Inspector(cpBuffer1,workBuffer1, lambdas1, stats);
+        Inspector ins2 = new Inspector(cpBuffer2, workBuffer2, lambdas2, stats);
 
 
 
@@ -49,13 +49,14 @@ public class Simulation{
         work2.addInspector(ins2);
         work3.addInspector(ins2);
 
-        stats.startSimTime();
+
         work1.start();
         work2.start();
         work3.start();
 
         ins1.start();
         ins2.start();
+        stats.startSimTime();
 
 
         while(work1.isAlive() || work2.isAlive() || work3.isAlive() || ins1.isAlive() || ins2.isAlive()){

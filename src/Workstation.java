@@ -10,6 +10,10 @@ public class Workstation extends Thread{
     // Boolean to determine if the appropriate amount of products have been made
     private boolean done = false;
 
+
+    /**
+     * The inspectors that are attached to this workstation
+     */
     private ArrayList<Inspector> attached_inspectors;
 
     /**
@@ -33,6 +37,7 @@ public class Workstation extends Thread{
 
     /** Created Product Count */
     private int product_count = 0;
+
 
     /** Stats for the components */
     private Statistic stat;
@@ -58,16 +63,24 @@ public class Workstation extends Thread{
             this.extra_component_flag = true;
         }
 
+        // Create a list of attached inspectors
         attached_inspectors = new ArrayList<Inspector>();
+
+        // Stats to keep track of times
         this.stat = stat;
 
     }
 
-
+    /**
+     * Add a function to this workstations buffer
+     * @param c the component to be added
+     */
     public void add_Component(Component c){
+        // If the type is C1, add it to the C1 buffer
         if(c.getType() == "C1") {
             C1_buffer.add(c);
         }
+        // Anything else add it to the secondary buffer
         else if(c.getType() == extra_component.getType()){
             buffer.add(c);
         } else { // error case
@@ -75,35 +88,38 @@ public class Workstation extends Thread{
         }
     }
 
+    /**
+     * The main function to run the thread
+     */
     public void run(){
 
+        // Create a random number generator
         Random rnd = new Random();
-        if(!extra_component_flag){
-            while(product_count < 50) {
 
-                // Check if the buffer is not empty or full
+        // If this is workstation 1
+        if(!extra_component_flag){
+            while(product_count < 300) {
+
+                // Check if the buffer is not empty and is full
                 if(C1_buffer.size() == 2 && C1_buffer.size() > 0) {
 
-                    // Get the component and beginning of the ArrayList
+                    // Get the components from the ArrayList
                     Component c1 = C1_buffer.get(0);
                     Component c2 = C1_buffer.get(1);
 
-                    // End the queue time
-                    double queue_start_time1 = c1.getQueue_time();
-                    double queue_start_time2 = c2.getQueue_time();
-                    c1.setQueue_time(System.nanoTime() - queue_start_time1);
-                    c2.setQueue_time(System.nanoTime() - queue_start_time2);
+                    // Generate the random time and end queueing time
+                    double time = generateRandomTime(rnd, c1, c2);
 
-                    // Generate a exponential time for processing time
-                    double time = (-1/lambda) * Math.log(rnd.nextDouble());
-
+                    // Set the random processing time
                     c1.setProcessing_time(time);
                     c2.setProcessing_time(time);
 
+                    // Split the processing time into milliseconds and nanoseconds
                     int milli = (int) time;
                     int nano = (int) ((time - milli) * 1000000);
 
 
+                    // Process the component
                     synchronized (this){
                         try {
                             //System.out.println("Creating product...");
@@ -113,9 +129,11 @@ public class Workstation extends Thread{
                         }
                     }
 
+                    // Create the product and the component information
                     stat.processP1(c1,c2);
 
                     // Clear the buffer because the buffer will take 2 components
+                    assert(C1_buffer.size() == 2);
                     C1_buffer.clear();
                     product_count++;
 
@@ -132,27 +150,38 @@ public class Workstation extends Thread{
 
             }
         }else{
-            while(product_count < 50) {
+            // This is when the workstation takes another component alongside C1
+            while(product_count < 300) {
 
+                // Ensure that the buffer is not empty of over-filled
                 if(C1_buffer.size() <= 2 && buffer.size() <= 2 && buffer.size() > 0 && C1_buffer.size() >0) {
 
+                    //System.out.println(buffer.size());
+
+                    // Get the two components from each buffer
                     Component c1 = C1_buffer.get(0);
                     Component buffer_component = buffer.get(0);
 
-                    // End the queue time
-                    double queue_start_time1 = c1.getQueue_time();
-                    double queue_start_time2 = buffer_component.getQueue_time();
-                    c1.setQueue_time(System.nanoTime() - queue_start_time1);
-                    buffer_component.setQueue_time(System.nanoTime() - queue_start_time2);
+                    if (buffer_component == null){ // There is a bug right now where null is somehow being passed
+//                        System.out.println(buffer.size());
+                        System.out.println(buffer +"\n"+product_count);
+                        if(extra_component.getType() == "C2"){
+                            System.out.println("Null Detected in workstation 2");
+                        } else {
+                            System.out.println("Null Detected in workstation 3");
+                        }
+                    }
 
-                    double time = (-1/lambda) * Math.log(rnd.nextDouble());
+                    // End the queue time and generate a new random time
+                    double time = generateRandomTime(rnd, c1, buffer_component);
                     int milli = (int) time;
                     int nano = (int) ((time - milli) * 1000000);
 
-
+                    // Set the processing time for both components
                     c1.setProcessing_time(time);
                     buffer_component.setProcessing_time(time);
 
+                    // Process the product using the generated time
                     synchronized (this){
                         try {
                             //System.out.println("Creating product...");
@@ -162,8 +191,10 @@ public class Workstation extends Thread{
                         }
                     }
 
+                    // Create the product and keep track of the times of each component
                     stat.processProduct(buffer_component.getType(),c1,buffer_component);
 
+                    // Remove the components from the buffer
                     C1_buffer.remove(0);
                     buffer.remove(0);
                     product_count++;
@@ -198,39 +229,90 @@ public class Workstation extends Thread{
 
     }
 
+    /**
+     * Generate random times for processing and update queue times.
+     * @param rnd the random number generator
+     * @param c1 the C1 component
+     * @param buffer_component the other component needed to create a product
+     * @return the random number to be used for processing times
+     */
+    private double generateRandomTime(Random rnd, Component c1, Component buffer_component) {
+        double queue_start_time1 = c1.getQueue_time();
+        double queue_start_time2 = buffer_component.getQueue_time();
+        c1.setQueue_time(System.nanoTime() - queue_start_time1);
+        buffer_component.setQueue_time(System.nanoTime() - queue_start_time2);
 
+        return (-1/lambda) * Math.log(rnd.nextDouble());
+    }
+
+    /**
+     * Get the created product from this workstation
+     * @return String representation of the finished product
+     */
     public String getCreatedProduct() {
         return createdProduct;
     }
 
+    /**
+     * Set the created product of the workstation
+     * @param createdProduct the new created product
+     */
     public void setCreatedProduct(String createdProduct) {
         this.createdProduct = createdProduct;
     }
 
+    /**
+     * Get the buffer of the other component
+     * @return the buffer of the other component
+     */
     public ArrayList<Component> getBuffer() {
         return buffer;
     }
 
+    /**
+     * Set the buffer of the other component
+     * @param buffer the buffer of the other component
+     */
     public void setBuffer(ArrayList<Component> buffer) {
         this.buffer = buffer;
     }
 
+    /**
+     * Get the extra component used in the workstation
+     * @return the extra component used
+     */
     public Component getExtra_component() {
         return extra_component;
     }
 
+    /**
+     * Set the extra component
+     * @param extra_component the new extra component used in the workstation
+     */
     public void setExtra_component(Component extra_component) {
         this.extra_component = extra_component;
     }
 
+    /**
+     * Get the C1 buffer of the workstation
+     * @return the C1 buffer of the workstation
+     */
     public ArrayList<Component> getC1_buffer() {
         return C1_buffer;
     }
 
+    /**
+     * Set the C1 buffer
+     * @param c1_buffer the new C1 buffer
+     */
     public void setC1_buffer(ArrayList<Component> c1_buffer) {
         C1_buffer = c1_buffer;
     }
 
+    /**
+     * Determine if the C1 buffer is full
+     * @return true if full, false otherwise
+     */
     public boolean isC1Full(){
         if (C1_buffer.size() >= 2){
             return true;
@@ -238,6 +320,10 @@ public class Workstation extends Thread{
         return false;
     }
 
+    /**
+     * Determine if the other buffer is full
+     * @return true if the other buffer is full, false otherwise
+     */
     public boolean isBufferFull(){
         if (buffer.size() >= 2){
             return true;
@@ -245,14 +331,26 @@ public class Workstation extends Thread{
         return false;
     }
 
+    /**
+     * Get the product count of the workstation
+     * @return
+     */
     public int getProduct_count() {
         return product_count;
     }
 
+    /**
+     * Determine if the workstation is done making products
+     * @return true if finished making products, false otherwise
+     */
     public boolean isDone() {
         return done;
     }
 
+    /**
+     * Add an inspector to the workstation
+     * @param i the inspector to be added.
+     */
     public void addInspector(Inspector i){
         attached_inspectors.add(i);
     }
