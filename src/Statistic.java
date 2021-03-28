@@ -63,23 +63,39 @@ public class Statistic {
     /** Total time inspector 1 runs */
     private double ins2_run_time;
 
-    public Statistic(){
+    /**
+     * Default constructor of the Statistic object because all objects are initially set to 0
+     */
+    public Statistic(){ }
 
-    }
-
+    /**
+     * Start the simulation time of the system
+     */
     public void startSimTime(){
         total_simulation_time = System.nanoTime();
     }
 
+    /**
+     * End the simulation time and calculate the total sim time
+     */
     public void endSimTime(){
         double startTime = total_simulation_time;
         total_simulation_time = System.nanoTime() - total_simulation_time;
     }
 
+    /**
+     * Get the total simulation time when the simulation finishes
+     * @return the total simulation time
+     */
     public double getTotal_simulation_time(){
         return total_simulation_time;
     }
 
+    /**
+     * Get the information that was used to create the P1 product
+     * @param c1 The first C1 component used to create the P1 product
+     * @param c2 The second C1 used to create the P1 product
+     */
     public void processP1(Component c1, Component c2) {
         // Get delay times of components
         c1_delay += c1.getDelay_time() + c2.getDelay_time();
@@ -100,6 +116,12 @@ public class Statistic {
         C1_Count+=2;
     }
 
+    /**
+     * Process the information that was used to create either a P2 or P3 object
+     * @param type The type of product created
+     * @param c1 the C1 object used to create the product
+     * @param other_component the other component, either a C2 or C3, used to create this object.
+     */
     public void processProduct(String type, Component c1, Component other_component){
 
         // Get delay times of components
@@ -129,22 +151,37 @@ public class Statistic {
         }
     }
 
+    /**
+     * Start tracking inspector 1's execution time.
+     */
     public void ins1_start(){
         ins1_run_time = System.nanoTime();
     }
 
+    /**
+     * Stop tracking inspector 1's execution time
+     */
     public void ins1_end() {
         ins1_run_time = System.nanoTime() - ins1_run_time;
     }
 
+    /**
+     * Start tracking inspector 2's execution time
+     */
     public void ins2_start(){
         ins2_run_time = System.nanoTime();
     }
 
+    /**
+     * Stop tracking inspector 2's execution time.
+     */
     public void ins2_end() {
         ins2_run_time = System.nanoTime() - ins2_run_time;
     }
 
+    /**
+     * Generate a report at the end of the simulation with all the information.
+     */
     public void generateReport() {
         String out = "";
         out += "======================== Count Information ========================\n";

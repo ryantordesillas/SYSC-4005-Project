@@ -63,13 +63,13 @@ public class Inspector extends Thread {
             stats.ins1_start();
 
             // Create a random number generator to generate doubles
-            Random rnd = new Random();
+            Random C1_rnd = new Random();
 
             // This will be used for Inspector 1
             int x = 0;
             while (!attachedWorkstations[0].isDone() || !attachedWorkstations[1].isDone() || !attachedWorkstations[2].isDone()) {
                 //System.out.println(st);
-                double time = (-1 / lambdas[0]) * Math.log(rnd.nextDouble());
+                double time = (-1 / lambdas[0]) * Math.log(C1_rnd.nextDouble());
 
                 int milli = (int) time;
                 int nano = (int) ((time - milli) * 1000000);
@@ -114,19 +114,22 @@ public class Inspector extends Thread {
 
             stats.ins2_start();
             // use a random number to determine which file to read from
-            Random rand = new Random();
+            Random workstation_rand = new Random();
 
 
 
             // Use integers from 0-99
-            int rnd = rand.nextInt(100);
+            int rnd = workstation_rand.nextInt(100);
 
+            // Create a random generator for each component inspection time
+            Random C2_rand = new Random();
+            Random C3_rand = new Random();
 
             int x = 0;
             while (!attachedWorkstations[0].isDone() || !attachedWorkstations[1].isDone()) {
                 // This will need to be tweaked as it will continue until both files are completely read
                 if (rnd <= 49 && !attachedWorkstations[0].isDone()) { // this check will be skipped if the this workstation is done
-                    double time = (-1 / lambdas[0]) * Math.log(rand.nextDouble());
+                    double time = (-1 / lambdas[0]) * Math.log(C2_rand.nextDouble());
                     int milli = (int) time;
                     int nano = (int) ((time - milli) * 1000000);
                     Component c = new Component("C2");
@@ -154,7 +157,7 @@ public class Inspector extends Thread {
 
                 } else {
                     if(!attachedWorkstations[1].isDone()) {
-                        double time = (-1 / lambdas[1]) * Math.log(rand.nextDouble());
+                        double time = (-1 / lambdas[1]) * Math.log(C3_rand.nextDouble());
                         int milli = (int) time;
                         int nano = (int) ((time - milli) * 1000000);
                         Component c = new Component("C3");
@@ -181,7 +184,8 @@ public class Inspector extends Thread {
 
 
                 }
-                rnd = rand.nextInt(100);
+                // Update the random number for the next iteration
+                rnd = workstation_rand.nextInt(100);
             }
             stats.ins2_end();
             System.out.println("Other Iterations: " + x);
