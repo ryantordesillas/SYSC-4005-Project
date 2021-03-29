@@ -247,32 +247,32 @@ public class Statistic {
         out += "\nTotal delayed time: " + (c1_delay)/1000000;
         out += "\nTotal run time: " + (ins1_run_time)/1000000;
         out += "\nTotal time: " + (total_simulation_time)/1000000;
-        out += "\nUtilization for Inspector 1: " + ((c1_inspecting * 1000000) / ins1_run_time)*100; // the inspection time will need to be multiplied by 1000000 because it is tracked in milliseconds
+        out += "\nUtilization for Inspector 1: " + ((c1_inspecting * 1000000) / total_simulation_time)*100; // the inspection time will need to be multiplied by 1000000 because it is tracked in milliseconds
         out += "\n===================================================================\n\n";
         out += "======================== Inspector 2 Stats ========================\n";
         out += "Total inspection time: " + (c2_inspecting + c3_inspecting);
         out += "\nTotal delayed time: " + (c2_delay + c3_delay)/1000000;
         out += "\nTotal run time: " + (ins2_run_time)/1000000;
         out += "\nTotal time: " + (total_simulation_time)/1000000;
-        out += "\nUtilization for Inspector 2: " + (((c2_inspecting + c3_inspecting)*1000000)/ ins2_run_time)*100;
+        out += "\nUtilization for Inspector 2: " + (((c2_inspecting + c3_inspecting)*1000000)/ total_simulation_time)*100;
         out += "\n===================================================================\n\n";
         out += "======================== Workstation 1 Stats ========================\n";
         out += "Total inspection time: " + p1_processing;
         out += "\nTotal waiting time: " + work1_wait_time/1000000;
         out += "\nTotal runtime: " + work1_run_time/1000000;
-        out += "\nUtilization for Inspector 2: " + ((p1_processing*1000000)/ work1_run_time)*100;
+        out += "\nUtilization for Inspector 2: " + ((p1_processing*1000000)/ total_simulation_time)*100;
         out += "\n===================================================================\n\n";
         out += "======================== Workstation 2 Stats ========================\n";
         out += "Total inspection time: " + p2_processing;
         out += "\nTotal waiting time: " + work2_wait_time/1000000;
         out += "\nTotal runtime: " + work2_run_time/1000000;
-        out += "\nUtilization for Inspector 2: " + ((p2_processing*1000000)/ work2_run_time)*100;
+        out += "\nUtilization for Inspector 2: " + ((p2_processing*1000000)/ total_simulation_time)*100;
         out += "\n===================================================================\n\n";
         out += "======================== Workstation 3 Stats ========================\n";
         out += "Total inspection time: " + p3_processing;
         out += "\nTotal waiting time: " + work3_wait_time/1000000;
         out += "\nTotal runtime: " + work3_run_time/1000000;
-        out += "\nUtilization for Inspector 2: " + ((p3_processing*1000000)/ work3_run_time)*100;
+        out += "\nUtilization for Inspector 2: " + ((p3_processing*1000000)/ total_simulation_time)*100;
         out += "\n===================================================================\n\n";
         out += "======================== Inputs ========================\n";
         out += "c1 processing time array size: " + c1_inspecting_times.size();

@@ -101,8 +101,9 @@ public class Workstation extends Thread{
 
         // If this is workstation 1
         if(!extra_component_flag){
-            while(stat.elapsed_time() < 6.00e10) {
             double wait_time = System.nanoTime();
+
+            while(stat.elapsed_time() < 6.00e10) {
 
                 // Check if the buffer is not empty and is full
                 if(C1_buffer.size() <= 2 && C1_buffer.size() > 0) {
@@ -147,8 +148,7 @@ public class Workstation extends Thread{
                     stat.processP1(c1);
 
                     // Clear the buffer because the buffer will take 2 components
-                    assert(C1_buffer.size() == 2);
-                    C1_buffer.clear();
+                    C1_buffer.remove(0);
                     product_count++;
                     wait_time = System.nanoTime();
                 }
