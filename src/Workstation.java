@@ -38,6 +38,9 @@ public class Workstation extends Thread{
     /** Created Product Count */
     private int product_count = 0;
 
+    /** The runtime of this thread */
+    private double runtime = 0;
+
 
     /** Stats for the components */
     private Statistic stat;
@@ -92,7 +95,7 @@ public class Workstation extends Thread{
      * The main function to run the thread
      */
     public void run(){
-
+        runtime = System.nanoTime();
         // Create a random number generator
         Random rnd = new Random();
 
@@ -249,6 +252,17 @@ public class Workstation extends Thread{
             }
         }
         done = true;
+        runtime = System.nanoTime() - runtime;
+
+        if(!extra_component_flag) {
+            stat.setWork1_run_time(runtime);
+        }else{
+            if (extra_component.getType().equals("C2")){
+                stat.setWork2_run_time(runtime);
+            } else {
+                stat.setWork3_run_time(runtime);
+            }
+        }
 
     }
 

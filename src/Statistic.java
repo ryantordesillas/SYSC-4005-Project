@@ -1,6 +1,8 @@
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
+import java.util.ArrayList;
+
 public class Statistic {
 
     /** The Count of P1 products made */
@@ -71,6 +73,11 @@ public class Statistic {
     private double work2_wait_time;
     private double work3_wait_time;
 
+    /** total run time of the workstations */
+    private double work1_run_time;
+    private double work2_run_time;
+    private double work3_run_time;
+
     /** Input data */
     private ArrayList c1_inspecting_times = new ArrayList<>();
     private ArrayList c2_inspecting_times = new ArrayList<>();
@@ -114,7 +121,6 @@ public class Statistic {
     /**
      * Get the information that was used to create the P1 product
      * @param c1 The first C1 component used to create the P1 product
-     * @param c2 The second C1 used to create the P1 product
      */
     public void processP1(Component c1) {
         // Get delay times of components
@@ -253,17 +259,20 @@ public class Statistic {
         out += "======================== Workstation 1 Stats ========================\n";
         out += "Total inspection time: " + p1_processing;
         out += "\nTotal waiting time: " + work1_wait_time/1000000;
-        out += "\nUtilization for Inspector 2: " + ((p1_processing*1000000)/ total_simulation_time)*100;
+        out += "\nTotal runtime: " + work1_run_time/1000000;
+        out += "\nUtilization for Inspector 2: " + ((p1_processing*1000000)/ work1_run_time)*100;
         out += "\n===================================================================\n\n";
         out += "======================== Workstation 2 Stats ========================\n";
         out += "Total inspection time: " + p2_processing;
         out += "\nTotal waiting time: " + work2_wait_time/1000000;
-        out += "\nUtilization for Inspector 2: " + ((p2_processing*1000000)/ total_simulation_time)*100;
+        out += "\nTotal runtime: " + work2_run_time/1000000;
+        out += "\nUtilization for Inspector 2: " + ((p2_processing*1000000)/ work2_run_time)*100;
         out += "\n===================================================================\n\n";
         out += "======================== Workstation 3 Stats ========================\n";
         out += "Total inspection time: " + p3_processing;
         out += "\nTotal waiting time: " + work3_wait_time/1000000;
-        out += "\nUtilization for Inspector 2: " + ((p3_processing*1000000)/ total_simulation_time)*100;
+        out += "\nTotal runtime: " + work3_run_time/1000000;
+        out += "\nUtilization for Inspector 2: " + ((p3_processing*1000000)/ work3_run_time)*100;
         out += "\n===================================================================\n\n";
         out += "======================== Inputs ========================\n";
         out += "c1 processing time array size: " + c1_inspecting_times.size();
@@ -287,5 +296,17 @@ public class Statistic {
 
     public void addWork3WaitTime(double time){
         work3_wait_time+=time;
+    }
+
+    public void setWork1_run_time(double work1_run_time) {
+        this.work1_run_time = work1_run_time;
+    }
+
+    public void setWork2_run_time(double work2_run_time) {
+        this.work2_run_time = work2_run_time;
+    }
+
+    public void setWork3_run_time(double work3_run_time) {
+        this.work3_run_time = work3_run_time;
     }
 }

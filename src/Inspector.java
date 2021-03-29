@@ -211,28 +211,31 @@ public class Inspector extends Thread {
         // NOTE: in case of a tie, workstation 1 has the highest priority
         if(attachedWorkstations[0].getC1_buffer().size() <= attachedWorkstations[1].getC1_buffer().size() && attachedWorkstations[0].getC1_buffer().size() <= attachedWorkstations[2].getC1_buffer().size()
                 && !attachedWorkstations[0].isDone()){
-            //System.out.println("Sent to Workstation 1");
+            System.out.println("Sent to Workstation 1");
             return attachedWorkstations[0];
         }
         // Workstation 2 has the smallest queue and Workstation 2 has not finished yet
         else if(attachedWorkstations[1].getC1_buffer().size() <= attachedWorkstations[0].getC1_buffer().size() && attachedWorkstations[1].getC1_buffer().size() <= attachedWorkstations[2].getC1_buffer().size()
                 && !attachedWorkstations[1].isDone()){
-            //System.out.println("Sent to Workstation 2");
+            System.out.println("Sent to Workstation 2");
             return attachedWorkstations[1];
 
         // Workstation 3 has the smallest queue and Workstation 3 has not finished yet
         } else if (attachedWorkstations[2].getC1_buffer().size() <= attachedWorkstations[0].getC1_buffer().size() && attachedWorkstations[2].getC1_buffer().size() <= attachedWorkstations[1].getC1_buffer().size()
                 && !attachedWorkstations[2].isDone()){
-            //System.out.println("Sent to Workstation 3");
+            System.out.println("Sent to Workstation 3");
             return attachedWorkstations[2];
         } else { // If all of the workstations have the same size of buffers
             // Send it to the workstation that isn't done starting with 1
             if (!attachedWorkstations[0].isDone()){
+                System.out.println("Sent to Workstation 1");
                 return attachedWorkstations[0];
             }
             else if(!attachedWorkstations[1].isDone()){
+                System.out.println("Sent to Workstation 2");
                 return attachedWorkstations[1];
             } else {
+                System.out.println("Sent to Workstation 3");
                 return attachedWorkstations[2];
             }
         }
