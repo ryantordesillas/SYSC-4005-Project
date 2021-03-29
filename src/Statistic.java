@@ -83,6 +83,10 @@ public class Statistic {
         total_simulation_time = System.nanoTime() - total_simulation_time;
     }
 
+    public double elapsed_time(){
+        return System.nanoTime() - total_simulation_time;
+    }
+
     /**
      * Get the total simulation time when the simulation finishes
      * @return the total simulation time

@@ -58,14 +58,14 @@ public class Simulation{
         ins2.start();
         stats.startSimTime();
 
-
-        while(work1.isAlive() || work2.isAlive() || work3.isAlive() || ins1.isAlive() || ins2.isAlive()){
+        while(stats.elapsed_time() < 6.00e10){
 
         }
         stats.endSimTime();
+        stats.generateReport();
         System.out.println("Total Sim time: " + stats.getTotal_simulation_time()/(1000000000) + "s\n\n");
 
-        stats.generateReport();
+
 
     }
 }

@@ -98,7 +98,7 @@ public class Workstation extends Thread{
 
         // If this is workstation 1
         if(!extra_component_flag){
-            while(product_count < 300) {
+            while(stat.elapsed_time() < 6.00e10) {
 
                 // Check if the buffer is not empty and is full
                 if(C1_buffer.size() == 2 && C1_buffer.size() > 0) {
@@ -151,7 +151,7 @@ public class Workstation extends Thread{
             }
         }else{
             // This is when the workstation takes another component alongside C1
-            while(product_count < 300) {
+            while(stat.elapsed_time() < 6.00e10) {
 
                 // Ensure that the buffer is not empty of over-filled
                 if(C1_buffer.size() <= 2 && buffer.size() <= 2 && buffer.size() > 0 && C1_buffer.size() >0) {
@@ -170,6 +170,8 @@ public class Workstation extends Thread{
                         } else {
                             System.out.println("Null Detected in workstation 3");
                         }
+                        buffer.remove(0);
+                        continue;
                     }
 
                     // End the queue time and generate a new random time
