@@ -41,6 +41,9 @@ public class Workstation extends Thread{
     /** The runtime of this thread */
     private double runtime = 0;
 
+    /** Workstation number */
+    private int workstation_number= 1;
+
 
     /** Stats for the components */
     private Statistic stat;
@@ -103,7 +106,7 @@ public class Workstation extends Thread{
         if(!extra_component_flag){
             double wait_time = System.nanoTime();
 
-            while(stat.elapsed_time() < 6.00e10) {
+            while(stat.elapsed_time() < 3.00e11) {
 
                 // Check if the buffer is not empty and is full
                 if(C1_buffer.size() <= 2 && C1_buffer.size() > 0) {
@@ -131,14 +134,18 @@ public class Workstation extends Thread{
 
                     // Split the processing time into milliseconds and nanoseconds
                     int milli = (int) time;
-                    int nano = (int) ((time - milli) * 1000000);
+                    int micro = (int) ((time - milli) * 1000);
+
+                    // get the milliseconds to seconds by multiplying by 1000
+                    int sec = milli * 1000;
+                    sec+= micro;
 
 
                     // Process the component
                     synchronized (this){
                         try {
                             //System.out.println("Creating product...");
-                            this.wait(milli,nano);
+                            this.wait(sec,0);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -166,7 +173,7 @@ public class Workstation extends Thread{
         }else{
             double wait_time = System.nanoTime();
             // This is when the workstation takes another component alongside C1
-            while(stat.elapsed_time() < 6.00e10) {
+            while(stat.elapsed_time() < 3.00e11) {
 
                 // Ensure that the buffer is not empty of over-filled
                 if(C1_buffer.size() <= 2 && buffer.size() <= 2 && buffer.size() > 0 && C1_buffer.size() >0) {
@@ -200,7 +207,11 @@ public class Workstation extends Thread{
                     // End the queue time and generate a new random time
                     double time = generateRandomTime(rnd, c1, buffer_component);
                     int milli = (int) time;
-                    int nano = (int) ((time - milli) * 1000000);
+                    int micro = (int) ((time - milli) * 1000);
+
+                    // get the milliseconds to seconds by multiplying by 1000
+                    int sec = milli * 1000;
+                    sec+= micro;
 
                     // Set the processing time for both components
                     c1.setProcessing_time(time);
@@ -210,7 +221,7 @@ public class Workstation extends Thread{
                     synchronized (this){
                         try {
                             //System.out.println("Creating product...");
-                            this.wait(milli,nano);
+                            this.wait(sec,0);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }

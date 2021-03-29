@@ -46,7 +46,7 @@ public class Inspector extends Thread {
         synchronized (this){
             try {
                 //System.out.println("Waiting...");
-                this.wait(millis,nano);
+                this.wait(millis,0);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -72,14 +72,23 @@ public class Inspector extends Thread {
                 double time = (-1 / lambdas[0]) * Math.log(C1_rnd.nextDouble());
 
                 int milli = (int) time;
-                int nano = (int) ((time - milli) * 1000000);
+                int micro = (int) ((time - milli) * 1000);
+
+                // get the milliseconds to seconds by multiplying by 1000
+                int sec = milli * 1000;
+                System.out.println("Inspector 1: Inspecting Component 1 ("+time+")");
+                sec+= micro;
+
+
+                // create seconds and milliseconds
 
                 // Create a component now so we can track all of the times
                 Component c = new Component("C1");
                 c.setInspection_time(time);
 
                 // Do the processing first before picking a available workstation
-                inspectComponent(milli,nano);
+
+                inspectComponent(sec,0);
 
                 // We get the waiting time now because Inspector 1 will look for a buffer to send to
                 double start = System.nanoTime();
@@ -131,11 +140,16 @@ public class Inspector extends Thread {
                 if (rnd <= 49 && !attachedWorkstations[0].isDone()) { // this check will be skipped if the this workstation is done
                     double time = (-1 / lambdas[0]) * Math.log(C2_rand.nextDouble());
                     int milli = (int) time;
-                    int nano = (int) ((time - milli) * 1000000);
+                    int micro = (int) ((time - milli) * 1000);
+
+                    // get the milliseconds to seconds by multiplying by 1000
+                    int sec = milli * 1000;
+                    sec+= micro;
                     Component c = new Component("C2");
                     c.setInspection_time(time);
 
-                    inspectComponent(milli,nano);
+                    System.out.println("Inspector 2: Inspecting Component 2 ("+time+")");
+                    inspectComponent(sec,0);
 
                     synchronized (this) {
                         //System.out.println(attachedWorkstations[0].getBuffer().size());
@@ -153,17 +167,23 @@ public class Inspector extends Thread {
 
                     c.setQueue_time(System.nanoTime());
                     attachedWorkstations[0].add_Component(c);
+                    System.out.println("Inspector 2: C2 sent");
                     x++;
 
                 } else {
                     if(!attachedWorkstations[1].isDone()) {
                         double time = (-1 / lambdas[1]) * Math.log(C3_rand.nextDouble());
                         int milli = (int) time;
-                        int nano = (int) ((time - milli) * 1000000);
+                        int micro = (int) ((time - milli) * 1000);
+
+                        // get the milliseconds to seconds by multiplying by 1000
+                        int sec = milli * 1000;
+                        sec+= micro;
                         Component c = new Component("C3");
                         c.setInspection_time(time);
 
-                        inspectComponent(milli,nano);
+                        System.out.println("Inspector 2: Inspecting Component 3 ("+time+")");
+                        inspectComponent(sec,0);
                         synchronized (this) {
                             while (attachedWorkstations[1].isBufferFull() && !attachedWorkstations[1].isDone()) {
                                 try {
@@ -180,6 +200,7 @@ public class Inspector extends Thread {
                         c.setQueue_time(System.nanoTime());
                         attachedWorkstations[1].add_Component(c);
                         x++;
+                        System.out.println("Inspector 2: C3 sent");
                     }
 
 
@@ -211,31 +232,31 @@ public class Inspector extends Thread {
         // NOTE: in case of a tie, workstation 1 has the highest priority
         if(attachedWorkstations[0].getC1_buffer().size() <= attachedWorkstations[1].getC1_buffer().size() && attachedWorkstations[0].getC1_buffer().size() <= attachedWorkstations[2].getC1_buffer().size()
                 && !attachedWorkstations[0].isDone()){
-//            System.out.println("Sent to Workstation 1");
+            System.out.println("Inspector 1: Sent to Workstation 1");
             return attachedWorkstations[0];
         }
         // Workstation 2 has the smallest queue and Workstation 2 has not finished yet
         else if(attachedWorkstations[1].getC1_buffer().size() <= attachedWorkstations[0].getC1_buffer().size() && attachedWorkstations[1].getC1_buffer().size() <= attachedWorkstations[2].getC1_buffer().size()
                 && !attachedWorkstations[1].isDone()){
-//            System.out.println("Sent to Workstation 2");
+            System.out.println("Inspector 1: Sent to Workstation 2");
             return attachedWorkstations[1];
 
         // Workstation 3 has the smallest queue and Workstation 3 has not finished yet
         } else if (attachedWorkstations[2].getC1_buffer().size() <= attachedWorkstations[0].getC1_buffer().size() && attachedWorkstations[2].getC1_buffer().size() <= attachedWorkstations[1].getC1_buffer().size()
                 && !attachedWorkstations[2].isDone()){
-//            System.out.println("Sent to Workstation 3");
+            System.out.println("Inspector 1: Sent to Workstation 3");
             return attachedWorkstations[2];
         } else { // If all of the workstations have the same size of buffers
             // Send it to the workstation that isn't done starting with 1
             if (!attachedWorkstations[0].isDone()){
-//                System.out.println("Sent to Workstation 1");
+                System.out.println("Inspector 1: Sent to Workstation 1");
                 return attachedWorkstations[0];
             }
             else if(!attachedWorkstations[1].isDone()){
-//                System.out.println("Sent to Workstation 2");
+                System.out.println("Inspector 1: Sent to Workstation 2");
                 return attachedWorkstations[1];
             } else {
-//                System.out.println("Sent to Workstation 3");
+                System.out.println("Inspector 1: Sent to Workstation 3");
                 return attachedWorkstations[2];
             }
         }
