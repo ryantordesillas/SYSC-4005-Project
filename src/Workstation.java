@@ -140,6 +140,7 @@ public class Workstation extends Thread{
                     int sec = milli * 1000;
                     sec+= micro;
 
+                    System.out.println("Workstation 1: Creating P1 ("+time+")");
 
                     // Process the component
                     synchronized (this){
@@ -208,6 +209,12 @@ public class Workstation extends Thread{
                     double time = generateRandomTime(rnd, c1, buffer_component);
                     int milli = (int) time;
                     int micro = (int) ((time - milli) * 1000);
+
+                    if(extra_component.getType().equals("C2")){
+                        System.out.println("Workstation 2: Creating P2 ("+time+")");
+                    } else {
+                        System.out.println("Workstation 3: Creating P3 ("+time+")");
+                    }
 
                     // get the milliseconds to seconds by multiplying by 1000
                     int sec = milli * 1000;

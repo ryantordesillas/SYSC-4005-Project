@@ -155,6 +155,7 @@ public class Inspector extends Thread {
                         //System.out.println(attachedWorkstations[0].getBuffer().size());
                         while (attachedWorkstations[0].isBufferFull() && !attachedWorkstations[0].isDone()) {
                             try {
+                                System.out.println("Inspector 2: Waiting...");
                                 long startTime = System.nanoTime();
                                 this.wait();
                                 long endTime = System.nanoTime();
@@ -187,6 +188,7 @@ public class Inspector extends Thread {
                         synchronized (this) {
                             while (attachedWorkstations[1].isBufferFull() && !attachedWorkstations[1].isDone()) {
                                 try {
+                                    System.out.println("Inspector 2: Waiting...");
                                     long startTime = System.nanoTime();
                                     this.wait();
                                     long endTime = System.nanoTime();
