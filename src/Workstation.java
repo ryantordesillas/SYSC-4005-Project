@@ -99,20 +99,26 @@ public class Workstation extends Thread{
         // If this is workstation 1
         if(!extra_component_flag){
             while(stat.elapsed_time() < 6.00e10) {
+            double wait_time = System.nanoTime();
 
                 // Check if the buffer is not empty and is full
-                if(C1_buffer.size() == 2 && C1_buffer.size() > 0) {
+                if(C1_buffer.size() <= 2 && C1_buffer.size() > 0) {
+                    stat.addWork1WaitTime(System.nanoTime() - wait_time);
+//                    System.out.println("Processing P1");
 
                     // Get the components from the ArrayList
                     Component c1 = C1_buffer.get(0);
-                    Component c2 = C1_buffer.get(1);
+                    //Component c2 = C1_buffer.get(1);
 
                     // Generate the random time and end queueing time
-                    double time = generateRandomTime(rnd, c1, c2);
+                    //double time = generateRandomTime(rnd, c1, c2);
+                    double queue_start_time1 = c1.getQueue_time();
+                    c1.setQueue_time(System.nanoTime() - queue_start_time1);
+                    double time = (-1/lambda) * Math.log(rnd.nextDouble());
 
                     // Set the random processing time
                     c1.setProcessing_time(time);
-                    c2.setProcessing_time(time);
+                    //c2.setProcessing_time(time);
 
                     // Split the processing time into milliseconds and nanoseconds
                     int milli = (int) time;
@@ -130,13 +136,13 @@ public class Workstation extends Thread{
                     }
 
                     // Create the product and the component information
-                    stat.processP1(c1,c2);
+                    stat.processP1(c1);
 
                     // Clear the buffer because the buffer will take 2 components
                     assert(C1_buffer.size() == 2);
                     C1_buffer.clear();
                     product_count++;
-
+                    wait_time = System.nanoTime();
                 }
 
                 // Do a check to see if inspector 1 is waiting
@@ -150,12 +156,20 @@ public class Workstation extends Thread{
 
             }
         }else{
+            double wait_time = System.nanoTime();
             // This is when the workstation takes another component alongside C1
             while(stat.elapsed_time() < 6.00e10) {
 
                 // Ensure that the buffer is not empty of over-filled
                 if(C1_buffer.size() <= 2 && buffer.size() <= 2 && buffer.size() > 0 && C1_buffer.size() >0) {
 
+                    if(extra_component.getType() == "C2"){
+                        stat.addWork2WaitTime(System.nanoTime() - wait_time);
+//                        System.out.println("Processing P2");
+                    } else {
+                        stat.addWork3WaitTime(System.nanoTime() - wait_time);
+//                        System.out.println("Processing P3");
+                    }
                     //System.out.println(buffer.size());
 
                     // Get the two components from each buffer
@@ -170,6 +184,7 @@ public class Workstation extends Thread{
                         } else {
                             System.out.println("Null Detected in workstation 3");
                         }
+                        // I think this addresses the bug.
                         buffer.remove(0);
                         continue;
                     }
@@ -200,6 +215,7 @@ public class Workstation extends Thread{
                     C1_buffer.remove(0);
                     buffer.remove(0);
                     product_count++;
+                    wait_time = System.nanoTime();
                 }
 
                 //check if inspectors are waiting

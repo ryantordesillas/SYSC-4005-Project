@@ -1,3 +1,6 @@
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 public class Statistic {
 
     /** The Count of P1 products made */
@@ -63,6 +66,19 @@ public class Statistic {
     /** Total time inspector 1 runs */
     private double ins2_run_time;
 
+    /** Wait times for the workstations */
+    private double work1_wait_time;
+    private double work2_wait_time;
+    private double work3_wait_time;
+
+    /** Input data */
+    private ArrayList c1_inspecting_times = new ArrayList<>();
+    private ArrayList c2_inspecting_times = new ArrayList<>();
+    private ArrayList c3_inspecting_times = new ArrayList<>();
+    private ArrayList p1_processing_times = new ArrayList<>();
+    private ArrayList p2_processing_times = new ArrayList<>();
+    private ArrayList p3_processing_times = new ArrayList<>();
+
     /**
      * Default constructor of the Statistic object because all objects are initially set to 0
      */
@@ -100,24 +116,28 @@ public class Statistic {
      * @param c1 The first C1 component used to create the P1 product
      * @param c2 The second C1 used to create the P1 product
      */
-    public void processP1(Component c1, Component c2) {
+    public void processP1(Component c1) {
         // Get delay times of components
-        c1_delay += c1.getDelay_time() + c2.getDelay_time();
+        c1_delay += c1.getDelay_time();
 
         // Get inspection times
-        c1_inspecting += c1.getInspection_time() + c2.getInspection_time();
+        c1_inspecting += c1.getInspection_time();
+        c1_inspecting_times.add(c1.getInspection_time());
+        //c1_inspecting_times.add(c2.getInspection_time());
+        p1_processing_times.add(c1.getProcessing_time());
 
         // Get queue times
-        c1_queue += c1.getQueue_time() + c2.getQueue_time();
+        c1_queue += c1.getQueue_time();
 
         // Get process times of product 1
-        p1_processing += c1.getProcessing_time() + c2.getProcessing_time();
+        //p1_processing += c1.getProcessing_time() + c2.getProcessing_time();
+        p1_processing += c1.getProcessing_time();
 
         //Increment count by 1
         P1_Count++;
 
         //Increment C1_count by 2 because 2 components are used
-        C1_Count+=2;
+        C1_Count++;
     }
 
     /**
@@ -133,6 +153,7 @@ public class Statistic {
 
         // Get inspection times
         c1_inspecting += c1.getInspection_time();
+        c1_inspecting_times.add(c1.getInspection_time());
 
         // Get queue times
         c1_queue += c1.getQueue_time();
@@ -145,6 +166,8 @@ public class Statistic {
             c2_inspecting += other_component.getInspection_time();
             c2_queue += other_component.getQueue_time();
             p2_processing += other_component.getProcessing_time();
+            c2_inspecting_times.add(other_component.getInspection_time());
+            p2_processing_times.add(other_component.getProcessing_time());
         } else {
             C3_Count++;
             P3_Count++;
@@ -152,6 +175,8 @@ public class Statistic {
             c3_inspecting += other_component.getInspection_time();
             c3_queue += other_component.getQueue_time();
             p3_processing += other_component.getProcessing_time();
+            c3_inspecting_times.add(other_component.getInspection_time());
+            p3_processing_times.add(other_component.getProcessing_time());
         }
     }
 
@@ -225,7 +250,42 @@ public class Statistic {
         out += "\nTotal time: " + (total_simulation_time)/1000000;
         out += "\nUtilization for Inspector 2: " + (((c2_inspecting + c3_inspecting)*1000000)/ ins2_run_time)*100;
         out += "\n===================================================================\n\n";
+        out += "======================== Workstation 1 Stats ========================\n";
+        out += "Total inspection time: " + p1_processing;
+        out += "\nTotal waiting time: " + work1_wait_time/1000000;
+        out += "\nUtilization for Inspector 2: " + ((p1_processing*1000000)/ total_simulation_time)*100;
+        out += "\n===================================================================\n\n";
+        out += "======================== Workstation 2 Stats ========================\n";
+        out += "Total inspection time: " + p2_processing;
+        out += "\nTotal waiting time: " + work2_wait_time/1000000;
+        out += "\nUtilization for Inspector 2: " + ((p2_processing*1000000)/ total_simulation_time)*100;
+        out += "\n===================================================================\n\n";
+        out += "======================== Workstation 3 Stats ========================\n";
+        out += "Total inspection time: " + p3_processing;
+        out += "\nTotal waiting time: " + work3_wait_time/1000000;
+        out += "\nUtilization for Inspector 2: " + ((p3_processing*1000000)/ total_simulation_time)*100;
+        out += "\n===================================================================\n\n";
+        out += "======================== Inputs ========================\n";
+        out += "c1 processing time array size: " + c1_inspecting_times.size();
+        out += "\nc2 processing time array size: " + c2_inspecting_times.size();
+        out += "\nc3 processing time array size: " + c3_inspecting_times.size();
+        out += "\np1 processing time array size: " + p1_processing_times.size();
+        out += "\np2 processing time array size: " + p2_processing_times.size();
+        out += "\np3 processing time array size: " + p3_processing_times.size();
+
 
         System.out.println(out);
+    }
+
+    public void addWork1WaitTime(double time){
+        work1_wait_time+=time;
+    }
+
+    public void addWork2WaitTime(double time){
+        work2_wait_time+=time;
+    }
+
+    public void addWork3WaitTime(double time){
+        work3_wait_time+=time;
     }
 }

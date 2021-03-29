@@ -88,7 +88,7 @@ public class Component {
 
     /**
      * Get the time that it takes to inspect this component
-     * @return the time it takes to insepect this component
+     * @return the time it takes to inspect this component
      */
     public double getInspection_time() {
         return inspection_time;
