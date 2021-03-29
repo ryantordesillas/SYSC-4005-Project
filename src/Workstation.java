@@ -110,6 +110,11 @@ public class Workstation extends Thread{
                     Component c1 = C1_buffer.get(0);
                     //Component c2 = C1_buffer.get(1);
 
+                    if (c1 == null){
+                        System.out.println("Null Detected in workstation 1");
+                        C1_buffer.remove(0);
+                        continue;
+                    }
                     // Generate the random time and end queueing time
                     //double time = generateRandomTime(rnd, c1, c2);
                     double queue_start_time1 = c1.getQueue_time();
