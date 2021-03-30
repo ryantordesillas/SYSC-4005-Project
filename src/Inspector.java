@@ -96,28 +96,29 @@ public class Inspector extends Thread {
                 Workstation availableWorkstation = findAvailableWorkstation();
                 //System.out.println(availableWorkstation.isC1Full());
                 boolean did_wait = false;
-                if(!availableWorkstation.isDone()&& !availableWorkstation.isC1Full()) {
+                //if(!availableWorkstation.isDone()&& !availableWorkstation.isC1Full()) {
 
-                    synchronized (this) {
-                        while (availableWorkstation.isC1Full()) {
-                            try {
-                                did_wait = true;
-                                this.wait();
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+                synchronized (this) {
+                    while (availableWorkstation.isC1Full()) {
+                        try {
+                            did_wait = true;
+                            this.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
                     }
-
-                    if(did_wait){
-                        c.setDelay_time(System.nanoTime() - start);;
-                    } else {
-                        c.setDelay_time(0);
-                    }
-                    availableWorkstation.add_Component(c);
-                    x++;
-                    //System.out.println("sent");
                 }
+
+                if(did_wait){
+                    System.out.println("waited for "+ availableWorkstation.getWorkstation_number());
+                    c.setDelay_time(System.nanoTime() - start);;
+                } else {
+                    c.setDelay_time(0);
+                }
+                availableWorkstation.add_Component(c);
+                x++;
+                //System.out.println("sent");
+
             }
             stats.ins1_end();
             System.out.println("C1 Iterations: " + x);

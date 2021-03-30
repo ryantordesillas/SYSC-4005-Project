@@ -46,6 +46,8 @@ public class Workstation extends Thread{
     /** Stats for the components */
     private Statistic stat;
 
+    private int workstation_number = 1;
+
     boolean extra_component_flag = false;
     /**
      * The default constructor for the Workstation
@@ -65,6 +67,11 @@ public class Workstation extends Thread{
             buffer = new ArrayList<Component>();
             this.extra_component = extra_component;
             this.extra_component_flag = true;
+            if (extra_component.getType().equals("C2")){
+                workstation_number = 2;
+            } else {
+                workstation_number = 3;
+            }
         }
 
         // Create a list of attached inspectors
@@ -75,6 +82,10 @@ public class Workstation extends Thread{
         
         this.exec = exec;
 
+    }
+
+    public int getWorkstation_number() {
+        return workstation_number;
     }
 
     /**
