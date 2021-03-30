@@ -86,6 +86,10 @@ public class Statistic {
     private ArrayList p2_processing_times = new ArrayList<>();
     private ArrayList p3_processing_times = new ArrayList<>();
 
+    private double p1_throughput = 0;
+    private double p2_throughput = 0;
+    private double p3_throughput = 0;
+
     /**
      * Default constructor of the Statistic object because all objects are initially set to 0
      */
@@ -123,6 +127,7 @@ public class Statistic {
      * @param c1 The first C1 component used to create the P1 product
      */
     public void processP1(Component c1) {
+
         // Get delay times of components
         c1_delay += c1.getDelay_time();
 
@@ -142,7 +147,7 @@ public class Statistic {
         //Increment count by 1
         P1_Count++;
 
-        //Increment C1_count by 2 because 2 components are used
+        //Increment C1_count
         C1_Count++;
     }
 
@@ -241,6 +246,9 @@ public class Statistic {
         out += "Average processing time for P1: " + (p1_processing / P1_Count);
         out += "\nAverage processing time for P2: " + (p2_processing / P2_Count);
         out += "\nAverage processing time for P3: " + (p3_processing / P3_Count);
+        out += "\nThroughput for P1: " + (P1_Count / (total_simulation_time/1000000000));
+        out += "\nThroughput for P2: " + (P2_Count / (total_simulation_time/1000000000));
+        out += "\nThroughput for P3: " + (P3_Count / (total_simulation_time/1000000000));
         out += "\n===================================================================\n\n";
         out += "======================== Inspector 1 Stats ========================\n";
         out += "Total inspection time: " + (c1_inspecting);

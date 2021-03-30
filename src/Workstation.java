@@ -106,6 +106,9 @@ public class Workstation extends Thread{
             while(stat.elapsed_time() < 6.00e10) {
 
                 // Check if the buffer is not empty and is full
+                if(C1_buffer.size() > 2){
+                    System.out.println("C1 " + C1_buffer.size());
+                }
                 if(C1_buffer.size() <= 2 && C1_buffer.size() > 0) {
                     stat.addWork1WaitTime(System.nanoTime() - wait_time);
 //                    System.out.println("Processing P1");
@@ -168,6 +171,12 @@ public class Workstation extends Thread{
             // This is when the workstation takes another component alongside C1
             while(stat.elapsed_time() < 6.00e10) {
 
+                if(C1_buffer.size() > 2){
+                    System.out.println("C1: " + C1_buffer.size());
+                }
+                if(buffer.size() > 2){
+                    System.out.println("Other Buffer: " + buffer.size());
+                }
                 // Ensure that the buffer is not empty of over-filled
                 if(C1_buffer.size() <= 2 && buffer.size() <= 2 && buffer.size() > 0 && C1_buffer.size() >0) {
 

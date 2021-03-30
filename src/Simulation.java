@@ -59,7 +59,6 @@ public class Simulation{
         stats.startSimTime();
 
         while(stats.elapsed_time() < 6.00e10){
-
         }
         stats.endSimTime();
         stats.generateReport();
