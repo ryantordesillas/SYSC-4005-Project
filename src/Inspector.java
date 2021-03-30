@@ -22,6 +22,7 @@ public class Inspector extends Thread {
      */
     private double[] lambdas;
 
+    private double ins2_inspecting = 0;
 
     /**
      * The default constructor for the Inspector Object
@@ -86,12 +87,13 @@ public class Inspector extends Thread {
                 // Find the most available workstation
                 Workstation availableWorkstation = findAvailableWorkstation();
                 //System.out.println(availableWorkstation.isC1Full());
-
+                boolean did_wait = false;
                 if(!availableWorkstation.isDone()&& !availableWorkstation.isC1Full()) {
 
                     synchronized (this) {
                         while (availableWorkstation.isC1Full()) {
                             try {
+                                did_wait = true;
                                 this.wait();
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
@@ -99,8 +101,11 @@ public class Inspector extends Thread {
                         }
                     }
 
-                    c.setDelay_time(System.nanoTime() - start);
-                    c.setQueue_time(System.nanoTime());
+                    if(did_wait){
+                        c.setDelay_time(System.nanoTime() - start);;
+                    } else {
+                        c.setDelay_time(0);
+                    }
                     availableWorkstation.add_Component(c);
                     x++;
                     //System.out.println("sent");
@@ -135,21 +140,29 @@ public class Inspector extends Thread {
                     Component c = new Component("C2");
                     c.setInspection_time(time);
 
+
                     inspectComponent(milli,nano);
 
+                    boolean did_wait = false;
+                    long startTime = System.nanoTime();
                     synchronized (this) {
                         //System.out.println(attachedWorkstations[0].getBuffer().size());
                         while (attachedWorkstations[0].isBufferFull() && !attachedWorkstations[0].isDone()) {
                             try {
-                                long startTime = System.nanoTime();
+                                did_wait = true;
                                 this.wait();
-                                long endTime = System.nanoTime();
-                                c.setDelay_time(endTime-startTime);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
                         }
                     }
+                    if(did_wait){
+                        long endTime = System.nanoTime();
+                        c.setDelay_time(endTime-startTime);
+                    } else {
+                        c.setDelay_time(0);
+                    }
+
 
                     c.setQueue_time(System.nanoTime());
                     attachedWorkstations[0].add_Component(c);
@@ -164,18 +177,25 @@ public class Inspector extends Thread {
                         c.setInspection_time(time);
 
                         inspectComponent(milli,nano);
+
+                        boolean did_wait = false;
+                        long startTime = System.nanoTime();
                         synchronized (this) {
                             while (attachedWorkstations[1].isBufferFull() && !attachedWorkstations[1].isDone()) {
                                 try {
-                                    long startTime = System.nanoTime();
+                                    did_wait = true;
                                     this.wait();
-                                    long endTime = System.nanoTime();
-                                    c.setDelay_time(endTime-startTime);
-
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
                             }
+                        }
+
+                        if(did_wait){
+                            long endTime = System.nanoTime();
+                            c.setDelay_time(endTime-startTime);
+                        } else {
+                            c.setDelay_time(0);
                         }
                         c.setQueue_time(System.nanoTime());
                         attachedWorkstations[1].add_Component(c);
