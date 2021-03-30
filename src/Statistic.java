@@ -228,17 +228,17 @@ public class Statistic {
         out += "P1's made: " + P1_Count + "\nP2's made: " + P2_Count + "\nP3's made: " + P3_Count + "\nC1's used: " + C1_Count + "\nC2's used: " + C2_Count + "\nC3's used: " + C3_Count;
         out += "\n===================================================================\n\n";
         out += "======================== C1 Information ========================\n";
-        out += "Average inspecting time: " + (c1_inspecting / C1_Count)/60;
+        out += "Average inspecting time: " + (c1_inspecting / C1_Count)/6e7;
         out += "\nAverage delay time: "+ (c1_delay / C1_Count)/1000000;
         out += "\nAverage queue time: "+ (c1_queue / C1_Count)/1000000;
         out += "\n===================================================================\n\n";
         out += "======================== C2 Information ========================\n";
-        out += "Average inspecting time: " + (c2_inspecting / C2_Count)/60;
+        out += "Average inspecting time: " + (c2_inspecting / C2_Count)/6e7;
         out += "\nAverage delay time: "+ (c2_delay / C2_Count)/1000000;
         out += "\nAverage queue time: "+ (c2_queue / C2_Count)/1000000;
         out += "\n===================================================================\n\n";
         out += "======================== C3 Information ========================\n";
-        out += "Average inspecting time: " + (c3_inspecting / C3_Count)/60;
+        out += "Average inspecting time: " + (c3_inspecting / C3_Count)/6e7;
         out += "\nAverage delay time: "+ (c3_delay / C3_Count)/1000000;
         out += "\nAverage queue time: "+ (c3_queue / C3_Count)/1000000;
         out += "\n===================================================================\n\n";
@@ -251,13 +251,13 @@ public class Statistic {
         out += "\nThroughput for P3: " + (P3_Count / (total_simulation_time/3.6e9));
         out += "\n===================================================================\n\n";
         out += "======================== Inspector 1 Stats ========================\n";
-        out += "Total inspection time: " + (c1_inspecting);
+        out += "Total inspection time: " + (c1_inspecting)/6e7;
         out += "\nTotal delayed time: " + (c1_delay)/1000000;
         out += "\nTotal time: " + (total_simulation_time)/1000000;
         out += "\nUtilization for Inspector 1: " + ((c1_inspecting) / total_simulation_time)*100; // the inspection time will need to be multiplied by 1000000 because it is tracked in milliseconds
         out += "\n===================================================================\n\n";
         out += "======================== Inspector 2 Stats ========================\n";
-        out += "Total inspection time: " + (c2_inspecting + c3_inspecting);
+        out += "Total inspection time: " + (c2_inspecting + c3_inspecting)/6e7;
         out += "\nTotal delayed time: " + (c2_delay + c3_delay)/1000000;
         out += "\nUtilization for Inspector 2: " + ((c2_inspecting + c3_inspecting)/ total_simulation_time)*100;
         out += "\n===================================================================\n\n";
