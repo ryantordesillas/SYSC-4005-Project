@@ -22,7 +22,9 @@ public class Inspector extends Thread {
      */
     private double[] lambdas;
 
-    private double ins2_inspecting = 0;
+
+    /** execution time in nanoseconds */
+    private double exec;
 
     /**
      * The default constructor for the Inspector Object
@@ -31,11 +33,12 @@ public class Inspector extends Thread {
      * @param workstations the workstations attached to the
      * @param lambdas      the lambdas that will be used in the random number generation
      */
-    public Inspector(Component[] components, Workstation[] workstations, double[] lambdas, Statistic stats) {
+    public Inspector(Component[] components, Workstation[] workstations, double[] lambdas, Statistic stats, double exec) {
         inspectComponents = components;
         attachedWorkstations = workstations;
         this.lambdas = lambdas;
         this.stats = stats;
+        this.exec = exec;
     }
 
     /**
@@ -68,19 +71,24 @@ public class Inspector extends Thread {
 
             // This will be used for Inspector 1
             int x = 0;
-            while (!attachedWorkstations[0].isDone() || !attachedWorkstations[1].isDone() || !attachedWorkstations[2].isDone()) {
+            while (stats.elapsed_time() < exec) {
                 //System.out.println(st);
                 double time = (-1 / lambdas[0]) * Math.log(C1_rnd.nextDouble());
 
-                int milli = (int) time;
-                int nano = (int) ((time - milli) * 1000000);
+                // covert minutes to seconds
+                double min_to_sec = time *60;
+
+                int milli = (int) min_to_sec;
+                int nano = (int) ((min_to_sec - milli) * 1000000);
 
                 // Create a component now so we can track all of the times
                 Component c = new Component("C1");
-                c.setInspection_time(time);
+                c.setInspection_time(min_to_sec);
 
                 // Do the processing first before picking a available workstation
+                long startTime = System.nanoTime();
                 inspectComponent(milli,nano);
+                c.setInspection_time(System.nanoTime() - startTime);
 
                 // We get the waiting time now because Inspector 1 will look for a buffer to send to
                 double start = System.nanoTime();
@@ -131,20 +139,23 @@ public class Inspector extends Thread {
             Random C3_rand = new Random();
 
             int x = 0;
-            while (!attachedWorkstations[0].isDone() || !attachedWorkstations[1].isDone()) {
+            while (stats.elapsed_time() < exec) {
                 // This will need to be tweaked as it will continue until both files are completely read
                 if (rnd <= 49 && !attachedWorkstations[0].isDone()) { // this check will be skipped if the this workstation is done
                     double time = (-1 / lambdas[0]) * Math.log(C2_rand.nextDouble());
-                    int milli = (int) time;
-                    int nano = (int) ((time - milli) * 1000000);
+                    double min_to_sec = time *60;
+
+                    int milli = (int) min_to_sec;
+                    int nano = (int) ((min_to_sec - milli) * 1000000);
                     Component c = new Component("C2");
-                    c.setInspection_time(time);
 
 
+                    long startTime = System.nanoTime();
                     inspectComponent(milli,nano);
+                    c.setInspection_time(System.nanoTime() - startTime);
 
                     boolean did_wait = false;
-                    long startTime = System.nanoTime();
+                    startTime = System.nanoTime();
                     synchronized (this) {
                         //System.out.println(attachedWorkstations[0].getBuffer().size());
                         while (attachedWorkstations[0].isBufferFull() && !attachedWorkstations[0].isDone()) {
@@ -171,15 +182,19 @@ public class Inspector extends Thread {
                 } else {
                     if(!attachedWorkstations[1].isDone()) {
                         double time = (-1 / lambdas[1]) * Math.log(C3_rand.nextDouble());
-                        int milli = (int) time;
-                        int nano = (int) ((time - milli) * 1000000);
-                        Component c = new Component("C3");
-                        c.setInspection_time(time);
+                        double min_to_sec = time *60;
 
+                        int milli = (int) min_to_sec;
+                        int nano = (int) ((min_to_sec - milli) * 1000000);
+                        Component c = new Component("C3");
+                        c.setInspection_time(min_to_sec);
+
+                        long startTime = System.nanoTime();
                         inspectComponent(milli,nano);
+                        c.setInspection_time(System.nanoTime() - startTime);
 
                         boolean did_wait = false;
-                        long startTime = System.nanoTime();
+                        startTime = System.nanoTime();
                         synchronized (this) {
                             while (attachedWorkstations[1].isBufferFull() && !attachedWorkstations[1].isDone()) {
                                 try {
