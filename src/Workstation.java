@@ -137,7 +137,7 @@ public class Workstation extends Thread{
 
 
                     // Set the random processing time
-                    c1.setProcessing_time(min_to_sec);
+                    c1.setProcessing_time(time);
                     //c2.setProcessing_time(time);
 
                     // Split the processing time into milliseconds and nanoseconds
@@ -221,8 +221,8 @@ public class Workstation extends Thread{
                     int nano = (int) ((min_to_sec - milli) * 1000000);
 
                     // Set the processing time for both components
-                    c1.setProcessing_time(min_to_sec);
-                    buffer_component.setProcessing_time(min_to_sec);
+                    c1.setProcessing_time(time);
+                    buffer_component.setProcessing_time(time);
 
                     // Process the product using the generated time
                     synchronized (this){

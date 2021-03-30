@@ -71,12 +71,22 @@ public class Simulation{
         double time = stats.getTotal_simulation_time()/3.6e9;
         System.out.println("Total Sim time: " + time + " theoretical hours\n\n");
 
-        work1.stop();
-        work1.stop();
-        work1.stop();
+        if (work1.isAlive()) {
+            work1.stop();
+        }
+        if (work2.isAlive()) {
+            work2.stop();
+        }
+        if (work3.isAlive()) {
+            work3.stop();
+        }
 
-        ins1.stop();
-        ins2.stop();
+        if (ins1.isAlive()) {
+            ins1.stop();
+        }
+        if (ins2.isAlive()) {
+            ins2.stop();
+        }
 
 
     }
