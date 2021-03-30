@@ -67,7 +67,7 @@ public class Inspector extends Thread {
 
             // This will be used for Inspector 1
             int x = 0;
-            while (!attachedWorkstations[0].isDone() || !attachedWorkstations[1].isDone() || !attachedWorkstations[2].isDone()) {
+            while (stats.elapsed_time() < 6e11) {
                 //System.out.println(st);
                 double time = (-1 / lambdas[0]) * Math.log(C1_rnd.nextDouble());
 
@@ -135,7 +135,7 @@ public class Inspector extends Thread {
             Random C3_rand = new Random();
 
             int x = 0;
-            while (!attachedWorkstations[0].isDone() || !attachedWorkstations[1].isDone()) {
+            while (stats.elapsed_time() < 6e11) {
                 // This will need to be tweaked as it will continue until both files are completely read
                 if (rnd <= 49 && !attachedWorkstations[0].isDone()) { // this check will be skipped if the this workstation is done
                     double time = (-1 / lambdas[0]) * Math.log(C2_rand.nextDouble());

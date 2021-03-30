@@ -58,7 +58,7 @@ public class Simulation{
         ins2.start();
         stats.startSimTime();
 
-        while(stats.elapsed_time() < 3.00e11){
+        while(stats.elapsed_time() < 6e11){
 
         }
         stats.endSimTime();

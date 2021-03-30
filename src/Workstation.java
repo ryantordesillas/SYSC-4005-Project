@@ -174,7 +174,7 @@ public class Workstation extends Thread{
         }else{
             double wait_time = System.nanoTime();
             // This is when the workstation takes another component alongside C1
-            while(stat.elapsed_time() < 3.00e11) {
+            while(stat.elapsed_time() < 6e11) {
 
                 // Ensure that the buffer is not empty of over-filled
                 if(C1_buffer.size() <= 2 && buffer.size() <= 2 && buffer.size() > 0 && C1_buffer.size() >0) {
