@@ -76,7 +76,6 @@ public class Simulation{
         stats.endSimTime();
         stats.generateReport();
         double time = stats.getTotal_simulation_time()/3.6e9;
-        time -= 6;
         System.out.println("Total Sim time: " + time + " theoretical hours\n\n");
 
         if (work1.isAlive()) {

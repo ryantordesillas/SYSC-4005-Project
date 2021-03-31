@@ -103,7 +103,7 @@ public class Statistic {
         C1_Count = 0;
         C2_Count = 0;
         C3_Count = 0;
-        //total_simulation_time = System.nanoTime();
+        //total_simulation_time += (6*3.6e9);
         c1_delay = 0;
         p1_processing = 0;
         c1_queue = 0;
@@ -125,6 +125,9 @@ public class Statistic {
         p1_throughput = 0;
         p2_throughput = 0;
         p3_throughput = 0;
+        work1_wait_time = 0;
+        work2_wait_time = 0;
+        work3_wait_time = 0;
     }
 
     /**
@@ -256,9 +259,11 @@ public class Statistic {
      */
     public void generateReport() {
         String out = "";
-        out += "\nTheoretical Simulated time in seconds: "+ ((total_simulation_time - (6*3.6e9))/1e6) +"s";
-        out += "\nTheoretical Simulated time in mins: "+ ((total_simulation_time - (6*3.6e9))/6e7) +"mins";
-        out += "\nTheoretical Simulated time in hours: "+ ((total_simulation_time - (6*3.6e9))/3.6e9) +"hours\n";
+        // Remove the initialization phase time
+        total_simulation_time -= (6*3.6e9);
+        out += "\nTheoretical Simulated time in seconds: "+ ((total_simulation_time)/1e6) +"s";
+        out += "\nTheoretical Simulated time in mins: "+ ((total_simulation_time)/6e7) +"mins";
+        out += "\nTheoretical Simulated time in hours: "+ ((total_simulation_time)/3.6e9) +"hours\n";
         out += "======================== Count Information ========================\n";
         out += "P1's made: " + P1_Count + "\nP2's made: " + P2_Count + "\nP3's made: " + P3_Count + "\nC1's used: " + C1_Count + "\nC2's used: " + C2_Count + "\nC3's used: " + C3_Count;
         out += "\n===================================================================\n\n";
