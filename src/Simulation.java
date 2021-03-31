@@ -24,6 +24,9 @@ public class Simulation{
         int hours = myObj.nextInt();
         double exec = hours * 3.6e9;
 
+        //Add initialization time
+        exec += 6 *3.6e9;
+
         // The statistics to keep track of times
         Statistic stats = new Statistic();
 
@@ -65,10 +68,15 @@ public class Simulation{
         stats.startSimTime();
 
         while(stats.elapsed_time() < exec){
+            if(stats.elapsed_time() == 6*3.6e9){
+                System.out.println("Init finished!");
+                stats.reset();
+            }
         }
         stats.endSimTime();
         stats.generateReport();
         double time = stats.getTotal_simulation_time()/3.6e9;
+        time -= 6;
         System.out.println("Total Sim time: " + time + " theoretical hours\n\n");
 
         if (work1.isAlive()) {

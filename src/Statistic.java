@@ -95,6 +95,38 @@ public class Statistic {
      */
     public Statistic(){ }
 
+
+    public void reset(){
+        P1_Count = 0;
+        P2_Count = 0;
+        P3_Count = 0;
+        C1_Count = 0;
+        C2_Count = 0;
+        C3_Count = 0;
+        //total_simulation_time = System.nanoTime();
+        c1_delay = 0;
+        p1_processing = 0;
+        c1_queue = 0;
+        c1_inspecting = 0;
+        c2_delay = 0;
+        p2_processing = 0;
+        c2_queue = 0;
+        c2_inspecting = 0;
+        c3_delay = 0;
+        p3_processing = 0;
+        c3_queue = 0;
+        c3_inspecting = 0;
+        c1_inspecting_times.clear();
+        c2_inspecting_times.clear();
+        c3_inspecting_times.clear();
+        p1_processing_times.clear();
+        p2_processing_times.clear();
+        p3_processing_times.clear();
+        p1_throughput = 0;
+        p2_throughput = 0;
+        p3_throughput = 0;
+    }
+
     /**
      * Start the simulation time of the system
      */
@@ -224,8 +256,9 @@ public class Statistic {
      */
     public void generateReport() {
         String out = "";
-        out += "\nTheoretical Simulated time in seconds: "+ (total_simulation_time/1e6) +"s\n";
-        out += "\nTheoretical Simulated time in mins: "+ (total_simulation_time/6e7) +"mins\n";
+        out += "\nTheoretical Simulated time in seconds: "+ ((total_simulation_time - (6*3.6e9))/1e6) +"s";
+        out += "\nTheoretical Simulated time in mins: "+ ((total_simulation_time - (6*3.6e9))/6e7) +"mins";
+        out += "\nTheoretical Simulated time in hours: "+ ((total_simulation_time - (6*3.6e9))/3.6e9) +"hours\n";
         out += "======================== Count Information ========================\n";
         out += "P1's made: " + P1_Count + "\nP2's made: " + P2_Count + "\nP3's made: " + P3_Count + "\nC1's used: " + C1_Count + "\nC2's used: " + C2_Count + "\nC3's used: " + C3_Count;
         out += "\n===================================================================\n\n";
