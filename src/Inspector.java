@@ -26,6 +26,8 @@ public class Inspector extends Thread {
     /** execution time in nanoseconds */
     private double exec;
 
+    int test = 1;
+
     /**
      * The default constructor for the Inspector Object
      *
@@ -93,7 +95,7 @@ public class Inspector extends Thread {
                 // We get the waiting time now because Inspector 1 will look for a buffer to send to
                 double start = System.nanoTime();
                 // Find the most available workstation
-                Workstation availableWorkstation = findAvailableWorkstation();
+                Workstation availableWorkstation = new_operating_policy();
                 //System.out.println(availableWorkstation.isC1Full());
                 boolean did_wait = false;
                 //if(!availableWorkstation.isDone()&& !availableWorkstation.isC1Full()) {
@@ -110,7 +112,7 @@ public class Inspector extends Thread {
                 }
 
                 if(did_wait){
-                    System.out.println("waited for "+ availableWorkstation.getWorkstation_number());
+                    System.out.println("Inspector 1: waited for "+ availableWorkstation.getWorkstation_number());
                     c.setDelay_time(System.nanoTime() - start);;
                 } else {
                     c.setDelay_time(0);
@@ -169,6 +171,7 @@ public class Inspector extends Thread {
                         }
                     }
                     if(did_wait){
+                        System.out.println("Inspector 2: Waited for Workstation 2");
                         long endTime = System.nanoTime();
                         c.setDelay_time(endTime-startTime);
                     } else {
@@ -178,6 +181,7 @@ public class Inspector extends Thread {
 
                     c.setQueue_time(System.nanoTime());
                     attachedWorkstations[0].add_Component(c);
+                    System.out.println("Inspector 2: Sent to Workstation 2");
                     x++;
 
                 } else {
@@ -208,6 +212,7 @@ public class Inspector extends Thread {
                         }
 
                         if(did_wait){
+                            System.out.println("Inspector 2: Waited for Workstation 3");
                             long endTime = System.nanoTime();
                             c.setDelay_time(endTime-startTime);
                         } else {
@@ -215,6 +220,7 @@ public class Inspector extends Thread {
                         }
                         c.setQueue_time(System.nanoTime());
                         attachedWorkstations[1].add_Component(c);
+                        System.out.println("Inspector 2: Sent to Workstation 3");
                         x++;
                     }
 
@@ -274,6 +280,23 @@ public class Inspector extends Thread {
 //                System.out.println("Sent to Workstation 3");
                 return attachedWorkstations[2];
             }
+        }
+    }
+
+    public Workstation new_operating_policy() {
+
+        // Check if workstation 3 has components in its buffer and does not have enough C1 components to create a product
+        if(attachedWorkstations[2].getBuffer().size() > 0 && attachedWorkstations[2].getC1_buffer().size() <= 1){
+            System.out.println("Sent to Workstation 3");
+            return attachedWorkstations[2];
+        }
+        // Same thing with workstation 2
+        else if (attachedWorkstations[1].getBuffer().size() > 0 && attachedWorkstations[1].getC1_buffer().size() <= 1){
+            System.out.println("Sent to Workstation 2");
+            return attachedWorkstations[1];
+        } else { // Otherwise send it to workstation 1
+            System.out.println("Sent to Workstation 1");
+            return  attachedWorkstations[0];
         }
 
     }
