@@ -7,6 +7,7 @@ import java.util.Random;
 
 public class Workstation extends Thread{
 
+    private final double exec;
     // Boolean to determine if the appropriate amount of products have been made
     private boolean done = false;
 
@@ -45,6 +46,8 @@ public class Workstation extends Thread{
     /** Stats for the components */
     private Statistic stat;
 
+    private int workstation_number = 1;
+
     boolean extra_component_flag = false;
     /**
      * The default constructor for the Workstation
@@ -52,7 +55,7 @@ public class Workstation extends Thread{
      * @param extra_component_flag flag to determine if a 2nd component is needed
      * @param extra_component the extra component if the extra_component_flag is true
      */
-    public Workstation(double lambda, boolean extra_component_flag, Component extra_component, Statistic stat){
+    public Workstation(double lambda, boolean extra_component_flag, Component extra_component, Statistic stat, double exec){
 
         // Create the ArrayList that the Workstation will use
         C1_buffer = new ArrayList<Component>();
@@ -64,6 +67,11 @@ public class Workstation extends Thread{
             buffer = new ArrayList<Component>();
             this.extra_component = extra_component;
             this.extra_component_flag = true;
+            if (extra_component.getType().equals("C2")){
+                workstation_number = 2;
+            } else {
+                workstation_number = 3;
+            }
         }
 
         // Create a list of attached inspectors
@@ -71,7 +79,13 @@ public class Workstation extends Thread{
 
         // Stats to keep track of times
         this.stat = stat;
+        
+        this.exec = exec;
 
+    }
+
+    public int getWorkstation_number() {
+        return workstation_number;
     }
 
     /**
@@ -102,9 +116,13 @@ public class Workstation extends Thread{
         // If this is workstation 1
         if(!extra_component_flag){
             double wait_time = System.nanoTime();
-            while(product_count < 300) {
+
+            while(stat.elapsed_time() < exec) {
 
                 // Check if the buffer is not empty and is full
+                if(C1_buffer.size() > 2){
+                    System.out.println("C1 " + C1_buffer.size());
+                }
                 if(C1_buffer.size() <= 2 && C1_buffer.size() > 0) {
                     stat.addWork1WaitTime(System.nanoTime() - wait_time);
 //                    System.out.println("Processing P1");
@@ -113,19 +131,28 @@ public class Workstation extends Thread{
                     Component c1 = C1_buffer.get(0);
                     //Component c2 = C1_buffer.get(1);
 
+                    if (c1 == null){
+                        System.out.println("Null Detected in workstation 1");
+                        C1_buffer.remove(0);
+                        continue;
+                    }
                     // Generate the random time and end queueing time
                     //double time = generateRandomTime(rnd, c1, c2);
                     double queue_start_time1 = c1.getQueue_time();
                     c1.setQueue_time(System.nanoTime() - queue_start_time1);
                     double time = (-1/lambda) * Math.log(rnd.nextDouble());
+                    double min_to_sec = time *60;
+
+                    int milli = (int) min_to_sec;
+                    int nano = (int) ((min_to_sec - milli) * 1000000);
+
 
                     // Set the random processing time
                     c1.setProcessing_time(time);
                     //c2.setProcessing_time(time);
 
                     // Split the processing time into milliseconds and nanoseconds
-                    int milli = (int) time;
-                    int nano = (int) ((time - milli) * 1000000);
+
 
 
                     // Process the component
@@ -142,8 +169,7 @@ public class Workstation extends Thread{
                     stat.processP1(c1);
 
                     // Clear the buffer because the buffer will take 2 components
-                    assert(C1_buffer.size() == 2);
-                    C1_buffer.clear();
+                    C1_buffer.remove(0);
                     product_count++;
                     wait_time = System.nanoTime();
                 }
@@ -161,8 +187,14 @@ public class Workstation extends Thread{
         }else{
             double wait_time = System.nanoTime();
             // This is when the workstation takes another component alongside C1
-            while(product_count < 300) {
+            while(stat.elapsed_time() < exec) {
 
+                if(C1_buffer.size() > 2){
+                    System.out.println("C1: " + C1_buffer.size());
+                }
+                if(buffer.size() > 2){
+                    System.out.println("Other Buffer: " + buffer.size());
+                }
                 // Ensure that the buffer is not empty of over-filled
                 if(C1_buffer.size() <= 2 && buffer.size() <= 2 && buffer.size() > 0 && C1_buffer.size() >0) {
 
@@ -194,8 +226,10 @@ public class Workstation extends Thread{
 
                     // End the queue time and generate a new random time
                     double time = generateRandomTime(rnd, c1, buffer_component);
-                    int milli = (int) time;
-                    int nano = (int) ((time - milli) * 1000000);
+                    double min_to_sec = time *60;
+
+                    int milli = (int) min_to_sec;
+                    int nano = (int) ((min_to_sec - milli) * 1000000);
 
                     // Set the processing time for both components
                     c1.setProcessing_time(time);

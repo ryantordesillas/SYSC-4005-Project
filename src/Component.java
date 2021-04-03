@@ -5,6 +5,9 @@ public class Component {
      */
     private String type;
 
+    /** Start time used to determine throughput */
+    private double start_time;
+
     /** Time when the component is being processed at the workstation */
     private double processing_time;
 
@@ -23,6 +26,7 @@ public class Component {
      * @param type the type of Component this object will represent
      */
     public Component(String type){
+        start_time = System.nanoTime();
         this.type = type;
         processing_time = 0;
         delay_time = 0;
@@ -101,5 +105,9 @@ public class Component {
      */
     public void setInspection_time(double inspection_time) {
         this.inspection_time = inspection_time;
+    }
+
+    public double getStart_time() {
+        return start_time;
     }
 }
