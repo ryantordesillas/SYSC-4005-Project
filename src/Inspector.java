@@ -93,7 +93,7 @@ public class Inspector extends Thread {
                 // We get the waiting time now because Inspector 1 will look for a buffer to send to
                 double start = System.nanoTime();
                 // Find the most available workstation
-                Workstation availableWorkstation = findAvailableWorkstation();
+                Workstation availableWorkstation = new_sending_functionality();
                 //System.out.println(availableWorkstation.isC1Full());
                 boolean did_wait = false;
                 //if(!availableWorkstation.isDone()&& !availableWorkstation.isC1Full()) {
@@ -276,5 +276,27 @@ public class Inspector extends Thread {
             }
         }
 
+    }
+
+    public Workstation new_sending_functionality() {
+        // First send it to the component that needs a C1
+        if(attachedWorkstations[1].getBuffer().size() > attachedWorkstations[1].getC1_buffer().size()){
+            return attachedWorkstations[1];
+        }
+        else if (attachedWorkstations[2].getBuffer().size() > attachedWorkstations[2].getC1_buffer().size()){
+            return attachedWorkstations[2];
+        }
+        else if(attachedWorkstations[0].getC1_buffer().size() <= attachedWorkstations[2].getC1_buffer().size()){
+            return attachedWorkstations[0];
+        }
+        // Then check which workstations are not full starting with Workstation 2
+        else if(!attachedWorkstations[1].isC1Full() && attachedWorkstations[0].getC1_buffer().size() > 0){
+            return attachedWorkstations[1];
+        }
+        else if(!attachedWorkstations[2].isC1Full() && attachedWorkstations[0].getC1_buffer().size() > 0){
+            return attachedWorkstations[2];
+        } else {
+            return attachedWorkstations[0];
+        }
     }
 }
