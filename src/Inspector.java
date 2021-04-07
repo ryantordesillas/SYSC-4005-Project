@@ -277,4 +277,33 @@ public class Inspector extends Thread {
         }
 
     }
+
+    public Workstation new_sending_functionality() {
+        // First send it to the component that needs a C1
+        if(attachedWorkstations[1].getBuffer().size() > attachedWorkstations[1].getC1_buffer().size()){
+            return attachedWorkstations[1];
+        }
+        else if (attachedWorkstations[2].getBuffer().size() > attachedWorkstations[2].getC1_buffer().size()){
+            return attachedWorkstations[2];
+        }
+        else if(attachedWorkstations[0].getC1_buffer().size() == 0){ // If workstation 1 is empty
+            return attachedWorkstations[0];
+        }
+        // Then check which workstations are not full starting with Workstation 2
+        else if(attachedWorkstations[1].getC1_buffer().size() == 0){
+            return attachedWorkstations[1];
+        }
+        else if(attachedWorkstations[2].getC1_buffer().size() == 0){
+            return attachedWorkstations[2];
+        }
+        else if(attachedWorkstations[1].getC1_buffer().size() == 1){
+            return attachedWorkstations[1];
+        }
+        else if(attachedWorkstations[2].getC1_buffer().size() == 1){
+            return attachedWorkstations[2];
+        }
+        else {
+            return attachedWorkstations[0];
+        }
+    }
 }
