@@ -93,7 +93,7 @@ public class Inspector extends Thread {
                 // We get the waiting time now because Inspector 1 will look for a buffer to send to
                 double start = System.nanoTime();
                 // Find the most available workstation
-                Workstation availableWorkstation = findAvailableWorkstation();
+                Workstation availableWorkstation = new_sending_functionality();
                 //System.out.println(availableWorkstation.isC1Full());
                 boolean did_wait = false;
                 //if(!availableWorkstation.isDone()&& !availableWorkstation.isC1Full()) {
